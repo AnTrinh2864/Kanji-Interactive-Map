@@ -1,0 +1,55 @@
+1. Database (SQLite/Postgres)
+
+Why? To save user-created whiteboard layouts, custom notes, and progress.
+
+Without it, users lose data when refreshing.
+
+2. Authentication (JWT or OAuth)
+
+Why? Enables user accounts, so learners can save kanji collections and track progress.
+
+Save for later: focus first on open, anonymous exploration.
+
+3. Caching Layer (Redis or local cache)
+
+Why? KanjiAlive API has rate limits.
+
+Cache common queries to avoid hitting the API every time.
+
+Save for later: unnecessary until you have lots of traffic.
+
+4. GraphQL API
+
+Why? Kanji data is highly connected (radicals → kanji → compounds).
+
+GraphQL would let frontend query exact fields it needs.
+
+Save for later: REST is faster to start.
+
+5. Search Enhancements
+
+Fuzzy search for meanings ("tree" also matches "wood").
+
+Kanji search by radical or stroke count.
+
+Save for later: initial MVP only needs "search by meaning".
+
+6. Realtime Collaboration (WebSockets)
+
+Why? Make the whiteboard multi-user (friends study together, drag kanji live).
+
+Save for later: good for gamification, but complex infra.
+
+7. AI-powered Suggestions
+
+Why? Suggest similar kanji or highlight common confusions (日 vs 曰).
+
+Save for later: requires extra NLP/ML work, not MVP.
+
+🌐 i18n (translations) if you want Japanese/English UI.
+
+💾 Database (SQLite or Postgres) if you want to save user kanji maps.
+
+🔍 Search bar autosuggest (Radix Combobox or Downshift).
+
+🧩 State management (Zustand or Redux) if your app grows big.
