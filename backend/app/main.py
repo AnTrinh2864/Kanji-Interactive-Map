@@ -3,7 +3,15 @@ from jisho_api.word import Word
 from jisho_api.kanji import Kanji
 
 app = FastAPI()
+from fastapi.middleware.cors import CORSMiddleware
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],  # React dev server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 @app.get("/api/kanji/{query}")
 async def get_kanji(query: str):
     """
@@ -50,4 +58,5 @@ async def get_kanji(query: str):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Server error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+

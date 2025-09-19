@@ -1,4 +1,3 @@
-// src/App.tsx
 import { useState } from "react";
 import { SearchBar } from "./components/KanjiBoard/SearchBar";
 import { KanjiBoard } from "./components/KanjiBoard/KanjiBoard";
@@ -12,7 +11,7 @@ function App() {
         <SearchBar onSelect={setSelectedKanji} />
       </div>
       <div className="flex-1">
-        <KanjiBoard />
+        <KanjiBoard selectedKanji={selectedKanji} />
       </div>
     </div>
   );
