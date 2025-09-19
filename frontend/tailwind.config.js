@@ -1,17 +1,19 @@
-import { fontFamily } from "tailwindcss/defaultTheme";
-
-export default {
-  darkMode: ["class"],
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ["var(--font-sans)", ...fontFamily.sans],
+      colors: {
+        background: "var(--background)",
+        foreground: "var(--foreground)",
+      },
+      borderColor: {
+        border: "var(--border)",
+      },
+      ringColor: {
+        ring: "var(--ring)",
       },
     },
   },
-  plugins: [require("tailwind-animate")],
+  plugins: [],
 };

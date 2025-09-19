@@ -2,22 +2,19 @@ import axios from "axios";
 
 const API_BASE = "http://127.0.0.1:8000";
 
-export async function fetchKanji(character: string) {
-  try {
-    const response = await axios.get(
-      `${API_BASE}/kanji/${encodeURIComponent(character)}`
-    );
-    if (response.data.error) {
-        throw new Error("400 Kanji Not Found")
-    }
-    return response.data;
-  } catch (err: any) {
-    if (err.response) {
-      // Backend returned a non-2xx status code
-      throw new Error(err.response.data.detail || "Kanji not found");
-    } else {
-      // Network error, CORS, etc
-      throw new Error(err.message);
-    }
-  }
+export async function fetchKanji(query: string) {
+  const res = await axios.get(`${API_BASE}/api/kanji/${encodeURIComponent(query)}`);
+  console.log(res.data.json())
+  return res.data.json();
+}
+
+export async function fetchParts(kanji: string) {
+  const res = await axios.get(`${API_BASE}/api/kanji/${encodeURIComponent(kanji)}/parts`);
+  return res.data.json();
+}
+
+export async function fetchRelated(part: string, page: number = 0) {
+  const res = await axios.get(`${API_BASE}/api/part/${encodeURIComponent(part)}?page=${page}`);
+  
+  return res.data.json();
 }

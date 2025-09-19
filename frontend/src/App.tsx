@@ -1,14 +1,21 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import Demo from './components/main/Demo'
+// src/App.tsx
+import { useState } from "react";
+import { SearchBar } from "./components/KanjiBoard/SearchBar";
+import { KanjiBoard } from "./components/KanjiBoard/KanjiBoard";
 
 function App() {
+  const [selectedKanji, setSelectedKanji] = useState<any>(null);
 
   return (
-    <Demo></Demo>
-  )
+    <div className="h-screen flex flex-col">
+      <div className="p-4 border-b">
+        <SearchBar onSelect={setSelectedKanji} />
+      </div>
+      <div className="flex-1">
+        <KanjiBoard />
+      </div>
+    </div>
+  );
 }
 
-export default App
+export default App;
