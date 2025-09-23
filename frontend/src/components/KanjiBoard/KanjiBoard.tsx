@@ -7,15 +7,12 @@ import ReactFlow, {
   type Edge,
   useNodesState,
   useEdgesState,
+  BackgroundVariant,
 } from "reactflow";
 import "reactflow/dist/style.css";
-import { useSpring, animated } from "@react-spring/web";
-
-type KanjiNodeData = {
-  label: string;
-  meaning?: string;
-  type: "kanji" | "part" | "more";
-};
+import { useSpring, animated } from "@react-spring/web"
+import "./KanjiBoard.css"
+import { fetchParts } from "@/api/kanjiApi";
 
 export function KanjiBoard({ selectedKanji }: { selectedKanji: any }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -24,19 +21,31 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: any }) {
   // Animated entry
   const springs = useSpring({ opacity: 1, from: { opacity: 0 } });
 
-  const addKanji = (kanji: any) => {
-    if (!kanji) return;
-    const id = kanji.literal || kanji.kanji || kanji; // support different formats
-    if (!id) return;
+  const addKanji = (kanji: {
+    kanji: string;
+    meaning?: string;
+    meanings?: string[];
+    readings?: any;
+    radical?: any;
+    strokes?: number;
+  }) => {
+    if (!kanji?.kanji) return;
 
-    // Don’t add duplicate
+    const id = kanji.kanji;
     if (nodes.find((n) => n.id === id)) return;
 
     setNodes((nds) => [
       ...nds,
       {
         id,
-        data: { label: id, meaning: kanji.meaning, type: "kanji" },
+        data: {
+          label: id,
+          meaning: kanji.meaning,
+          meanings: kanji.meanings,
+          radical: kanji.radical,
+          reading: kanji.readings,
+          type: "kanji",
+        },
         position: { x: Math.random() * 400, y: Math.random() * 400 },
       },
     ]);
@@ -46,8 +55,15 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: any }) {
   useEffect(() => {
     if (selectedKanji) {
       addKanji(selectedKanji);
+      console.log("added: " + selectedKanji.kanji)
     }
   }, [selectedKanji]);
+  useEffect(() => {
+    if (selectedKanji) {
+      addKanji(selectedKanji);
+      console.log("added: " + selectedKanji.kanji)
+    }
+  }, []);
 
   const addParts = (kanjiId: string, parts: string[]) => {
     const baseX = Math.random() * 400;
@@ -105,10 +121,7 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: any }) {
 
   const handleNodeClick = (node: Node) => {
     if (node.data.type === "kanji") {
-      // fetch parts from backend
-      fetch(`/api/kanji/${node.data.label}/parts`)
-        .then((res) => res.json())
-        .then((data) => addParts(node.id, data.parts));
+      addParts(node.id, node.data.radical.parts)
     } else if (node.data.type === "part") {
       // fetch related kanji
       fetch(`/api/part/${node.data.label}?page=0`)
@@ -129,7 +142,7 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: any }) {
     setEdges((eds) => eds.filter((e) => e.source !== node.id && e.target !== node.id));
   };
 return (
-    <animated.div style={springs} className="h-full w-full">
+    <animated.div style={springs} className="Board">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -141,7 +154,7 @@ return (
       >
         <MiniMap />
         <Controls />
-        <Background />
+       <Background variant={"dots" as BackgroundVariant} gap={16} size={1} />
       </ReactFlow>
     </animated.div>
   );

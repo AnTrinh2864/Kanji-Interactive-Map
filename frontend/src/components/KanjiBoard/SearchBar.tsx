@@ -1,13 +1,12 @@
 // src/components/SearchBar.tsx
 import { useEffect, useState } from "react";
 import { fetchKanji } from "@/api/kanjiApi";
-import "@/components/KanjiBoard/searchbar.css";
 
 export function SearchBar({ onSelect }: { onSelect: (k: any) => void }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-
+  const [show, setShow] = useState(true)
   const handleSearch = async (value: string) => {
     setQuery(value);
     if (value.trim().length < 1) return;
@@ -42,37 +41,51 @@ export function SearchBar({ onSelect }: { onSelect: (k: any) => void }) {
         />
         <button
           id="searchbar-button"
-          onClick={() => void handleSearch(query)}
+          onClick={() => { 
+            handleSearch(query) 
+            setShow(true)}}
         >
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
 
-      <div id="searchbar-suggestions">
+      {show && <div id="searchbar-suggestions">
         {suggestions.map((k, i) => {
+          const normalized = {
+            kanji: k.kanji,
+            meaning: k.main_meanings?.[0] ?? "",
+            meanings: k.main_meanings ?? [],
+            readings: k.main_readings ?? {}, //kun or on
+            radical: k.radical ?? null, //parts is in this
+          };
           if (k && typeof k === "object" && "kanji" in k) {
             return (
               <button
                 key={i}
                 id={`searchbar-suggestion-${i}`}
-                onClick={() => onSelect(k)}
+                onClick={() => {
+                  setShow(false)
+                  onSelect(normalized)
+                }}
               >
-                {k.kanji}
+                {normalized.kanji} - {normalized.meaning}
               </button>
             );
           }
-
           return (
             <button
               key={i}
               id={`searchbar-suggestion-${i}`}
-              onClick={() => onSelect(k)}
+              onClick={() => {
+                setShow(false)
+                onSelect(normalized)}}
             >
-              {k}
+              {normalized.kanji}
             </button>
           );
         })}
       </div>
+        }
     </div>
   );
 }
