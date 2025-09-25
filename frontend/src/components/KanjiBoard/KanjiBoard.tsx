@@ -5,7 +5,6 @@ import ReactFlow, {
   Controls,
   Background,
   type Node,
-  type Edge,
   useNodesState,
   useEdgesState,
   BackgroundVariant,
@@ -13,7 +12,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useSpring, animated } from "@react-spring/web";
 import "./KanjiBoard.css";
-import { fetchKanji, fetchParts, fetchRelated } from "@/api/kanjiApi";
+import { fetchKanji, fetchRelated } from "@/api/kanjiApi";
 
 type KanjiData = {
   kanji: string;
