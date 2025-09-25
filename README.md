@@ -32,3 +32,5 @@ npm install axios reactflow @react-spring/web
 npm run dev
 
 
+Attribution:
+This project is using data from Jisho, Kanji Alive Api, and Kanjivg svg files.
