@@ -1,6 +1,9 @@
+import os
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from jisho_api.word import Word
 from jisho_api.kanji import Kanji
+from pymongo import MongoClient
 
 app = FastAPI()
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +15,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+load_dotenv()
+
+MONGO_USER = os.getenv("DB_USERNAME")
+MONGO_PASS = os.getenv("DB_PASSWORD")
+
+uri = f"mongodb+srv://{MONGO_USER}:{MONGO_PASS}@hongancluster.jcwo3zj.mongodb.net/?retryWrites=true&w=majority&appName=HongAnCluster"
+client = MongoClient(uri)
+
+db = client["Kanji-Radical-Map"]
+radicals_collection = db["Kanji Radical Map"]
+
 @app.get("/api/kanji/{query}")
 async def get_kanji(query: str):
     """
@@ -60,3 +75,21 @@ async def get_kanji(query: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/parts/{part}")
+async def get_kanji_by_part(part: str):
+    """
+    Look up all kanji in MongoDB that contain a given part (radical).
+    """
+    try:
+        doc = radicals_collection.find_one({"radical": part})
+
+        if not doc or "kanjis" not in doc:
+            raise HTTPException(status_code=404, detail=f"No kanji found with part '{part}'")
+
+        # Clean up ObjectId
+        doc["_id"] = str(doc["_id"])
+
+        return {"part": part, "kanji_list": doc["kanjis"]}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

@@ -1,12 +1,14 @@
 // src/components/SearchBar.tsx
 import { useEffect, useState } from "react";
 import { fetchKanji } from "@/api/kanjiApi";
+import "./SearchBar.css"; // add styles for modal here
 
 export function SearchBar({ onSelect }: { onSelect: (k: any) => void }) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [show, setShow] = useState(true)
+  const [showModal, setShowModal] = useState(false);
+
   const handleSearch = async (value: string) => {
     setQuery(value);
     if (value.trim().length < 1) return;
@@ -15,8 +17,10 @@ export function SearchBar({ onSelect }: { onSelect: (k: any) => void }) {
       setLoading(true);
       const data = await fetchKanji(value);
       setSuggestions(data.kanji_list || [data.kanji]);
+      setShowModal(true); // open modal after fetching
     } catch {
       setSuggestions([]);
+      setShowModal(true);
     } finally {
       setLoading(false);
     }
@@ -31,8 +35,8 @@ export function SearchBar({ onSelect }: { onSelect: (k: any) => void }) {
   }, [suggestions]);
 
   return (
-    <div  id="searchbar-container">
-      <div  id="searchbar-input-row">
+    <div id="searchbar-container">
+      <div id="searchbar-input-row">
         <input
           id="searchbar-input"
           placeholder="Search in English or Japanese..."
@@ -41,51 +45,50 @@ export function SearchBar({ onSelect }: { onSelect: (k: any) => void }) {
         />
         <button
           id="searchbar-button"
-          onClick={() => { 
-            handleSearch(query) 
-            setShow(true)}}
+          onClick={() => handleSearch(query)}
+          disabled = {loading}
         >
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
 
-      {show && <div id="searchbar-suggestions">
-        {suggestions.map((k, i) => {
-          const normalized = {
-            kanji: k.kanji,
-            meaning: k.main_meanings?.[0] ?? "",
-            meanings: k.main_meanings ?? [],
-            readings: k.main_readings ?? {}, //kun or on
-            radical: k.radical ?? null, //parts is in this
-          };
-          if (k && typeof k === "object" && "kanji" in k) {
-            return (
-              <button
-                key={i}
-                id={`searchbar-suggestion-${i}`}
-                onClick={() => {
-                  setShow(false)
-                  onSelect(normalized)
-                }}
-              >
-                {normalized.kanji} - {normalized.meaning}
-              </button>
-            );
-          }
-          return (
-            <button
-              key={i}
-              id={`searchbar-suggestion-${i}`}
-              onClick={() => {
-                setShow(false)
-                onSelect(normalized)}}
-            >
-              {normalized.kanji}
+      {/* Modal */}
+      {showModal && (
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div
+            className="modal-content"
+            onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+          >
+            <h3>Suggestions</h3>
+            <div className="modal-suggestions">
+              {suggestions.map((k, i) => {
+                const normalized = {
+                  kanji: k.kanji,
+                  meaning: k.main_meanings?.[0] ?? "",
+                  meanings: k.main_meanings ?? [],
+                  readings: k.main_readings ?? {}, //kun or on
+                  radical: k.radical ?? null,
+                };
+                return (
+                  <button
+                    key={i}
+                    className="modal-suggestion"
+                    onClick={() => {
+                      setShowModal(false);
+                      onSelect(normalized);
+                    }}
+                  >
+                    {normalized.kanji} {normalized.meaning && `- ${normalized.meaning}`}
+                  </button>
+                );
+              })}
+            </div>
+            <button className="modal-close" onClick={() => setShowModal(false)}>
+              Close
             </button>
-          );
-        })}
-      </div>
-        }
+          </div>
+        </div>
+      )}
     </div>
   );
 }
