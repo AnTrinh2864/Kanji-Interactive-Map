@@ -37,12 +37,12 @@
   border-radius: 6px;
   text-align: center;
 }
-
 .Board {
-    height: 1000px;
-    width: 1600px;
-    z-index: 0; 
-    cursor:auto;
+  height: 490px;
+  width: 1250px;
+  z-index: 0; 
+  cursor:auto;
+  overflow-y: hidden;
 }
 
 /* KanjiBoard.css */
@@ -76,4 +76,17 @@
   border-radius: 6px;
   padding: 6px;
   text-align: center;
+}
+
+.kanji-minimap {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  width: 200px !important;
+  height: 140px !important;
+  border: 2px solid #333;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 10;
 }

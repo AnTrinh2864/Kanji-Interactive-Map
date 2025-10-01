@@ -2,30 +2,34 @@ import { useState } from "react";
 import { SearchBar } from "./components/KanjiBoard/SearchBar";
 import { KanjiBoard } from "./components/KanjiBoard/KanjiBoard";
 import { KanjiDetail } from "./components/KanjiBoard/KanjiDetail";
+import { PartLinkBoard } from "./components/KanjiBoard/PartLinkBoard";
+import "./App.css";
 
 function App() {
   const [selectedKanji, setSelectedKanji] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState<"explorer" | "details">("explorer");
+  const [activeTab, setActiveTab] = useState<"explorer" | "details" | "partlink">("explorer");
 
   return (
     <div className="h-screen flex flex-col">
       {/* Navbar */}
-      <nav className="bg-gray-800 text-white p-4 flex space-x-6">
+      <nav id="navbar">
         <button
           onClick={() => setActiveTab("explorer")}
-          className={`${
-            activeTab === "explorer" ? "font-bold border-b-2 border-white" : ""
-          }`}
+          className={activeTab === "explorer" ? "tab active" : "tab"}
         >
           Kanji Explorer
         </button>
         <button
           onClick={() => setActiveTab("details")}
-          className={`${
-            activeTab === "details" ? "font-bold border-b-2 border-white" : ""
-          }`}
+          className={activeTab === "details" ? "tab active" : "tab"}
         >
           Kanji Details
+        </button>
+        <button
+          onClick={() => setActiveTab("partlink")}
+          className={activeTab === "partlink" ? "tab active" : "tab"}
+        >
+          Part Link
         </button>
       </nav>
 
@@ -54,6 +58,12 @@ function App() {
                 Select a kanji first to see details.
               </div>
             )}
+          </div>
+        )}
+
+        {activeTab === "partlink" && (
+          <div className="h-full p-4">
+            <PartLinkBoard />
           </div>
         )}
       </div>

@@ -176,16 +176,27 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: KanjiData | null 
 
   return (
     <animated.div style={springs} className="Board">
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onNodeClick={(_, node) => handleNodeClick(node)}
-        onNodeContextMenu={handleNodeContextMenu}
-        fitView
+    <ReactFlow
+      nodes={nodes}
+      edges={edges}
+      onNodesChange={onNodesChange}
+      onEdgesChange={onEdgesChange}
+      onNodeClick={(_, node) => handleNodeClick(node)}
+      onNodeContextMenu={handleNodeContextMenu}
+      fitView
       >
-        <MiniMap />
+        <MiniMap 
+          className="kanji-minimap"
+          nodeColor={(node) => {
+            if (node.className?.includes("kanji-node")) return "#10b981";
+            if (node.className?.includes("part-node")) return "#3b82f6";
+            if (node.className?.includes("more-node")) return "#f59e0b";
+            return "#999";
+          }}
+          zoomable
+          pannable
+          
+          />
         <Controls />
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
       </ReactFlow>
