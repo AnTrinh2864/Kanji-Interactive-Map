@@ -1,0 +1,154 @@
+/* Main container */
+#kanji-detail {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: #222;
+  position: relative;
+  gap: 3rem;
+}
+
+#big-kanji {
+  display: flex;
+  align-items: center;   /* vertical center */
+  justify-content: center; /* horizontal center */
+  font-size: 12rem;
+  font-weight: bold;
+  line-height: 1;
+  top: 1rem;
+  right: 2rem;
+  opacity: 0.95;
+  color: #26472b;
+  border: 2px dashed rgb(185, 185, 185);
+  width: 300px;
+  height: 300px;
+}
+
+#right-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    width: 35%;
+}
+/* Info section */
+#kanji-info {
+  flex: 1;
+  max-width: 800px;
+}
+
+#kanji-info h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+#kanji-info #strokes {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: #666;
+}
+
+#kanji-info h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #444;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 0.25rem;
+}
+
+#kanji-info p {
+  font-size: 1rem;
+  line-height: 1.6;
+  margin: 0.25rem 0;
+}
+
+/* Examples */
+#examples {
+  display: flex;
+  gap: 2rem;
+}
+
+#examples h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+#examples ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+#examples li {
+  margin: 0.25rem 0;
+  font-size: 0.95rem;
+}
+
+.example-kanji {
+  font-weight: bold;
+  margin-right: 0.5rem;
+}
+
+/* Loading state */
+#loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.25rem;
+  color: #666;
+}
+/* Modal styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1050;
+}
+
+.modal-content {
+  position: relative;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
+}
+
+.modal-img {
+  width: 100%;
+  height: auto;
+  max-height: 80vh;
+  object-fit: contain;
+}
+
+.close-btn {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  border: none;
+  background: #eee;
+  font-size: 1.25rem;
+  cursor: pointer;
+  border-radius: 50%;
+  padding: 0.25rem 0.5rem;
+}
+
+.close-btn:hover {
+  background: #ccc;
+}

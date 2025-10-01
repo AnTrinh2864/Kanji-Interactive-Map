@@ -1,56 +1,121 @@
 import { useEffect, useState } from "react";
 import { fetchKanji } from "@/api/kanjiApi";
+import "./KanjiDetail.css";
 
-
-export function KanjiDetail({ literal }: { literal: string}) {
+export function KanjiDetail({ literal }: { literal: string }) {
   const [info, setInfo] = useState<any | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    const fetchData = async() => {
-        try {
-        console.log(literal)
+    const fetchData = async () => {
+      try {
         const doc = await fetchKanji(literal);
-        setInfo(doc)
-        } catch (err) {
+        setInfo(doc);
+      } catch (err) {
         console.error(err);
-        }
-    }
-    fetchData()
+      }
+    };
+    fetchData();
   }, [literal]);
 
   if (!info) {
-    return <div className="p-6 text-center">Loading kanji...</div>;
+    return <div id="loading">Loading kanji...</div>;
   }
 
+  const k = info.kanji;
+  const unicodeHex = k.kanji.codePointAt(0)?.toString(16);
+  const strokeOrderPath = unicodeHex ? `/kanji/0${unicodeHex}.svg` : null;
+
   return (
-    <div className="max-w-3xl mx-auto p-6 space-y-6">
-      {/* Big Kanji */}
-      <div className="text-center">
-        <div className="text-9xl font-bold">{info.kanji.kanji}</div> {/*This is not working atm */}
+    <div id="kanji-detail">
+     
+      {/* Info Section */}
+      <div id="kanji-info">
+        <h1>{k.kanji}</h1>
+        <p id="strokes">{k.strokes} strokes</p>
+
+        <h2>Meanings</h2>
+        <p>{k.main_meanings?.join(", ") || "—"}</p>
+
+        <h2>Readings</h2>
+        <p>
+          <strong>On:</strong> {k.main_readings?.on?.join(", ") || "—"}
+        </p>
+        <p>
+          <strong>Kun:</strong> {k.main_readings?.kun?.join(", ") || "—"}
+        </p>
+
+        <h2>Radical</h2>
+        <p>
+          Main radical: {k.radical?.basis} ({k.radical?.meaning})
+        </p>
+        {k.radical?.parts && k.radical.parts.length > 0 && (
+          <p>Parts: {k.radical.parts.join(", ")}</p>
+        )}
+
+        <h2>Reading Examples</h2>
+        <div id="examples">
+          <div>
+            <h3>Kun</h3>
+            <ul>
+              {k.reading_examples?.kun?.map((ex: any, i: number) => (
+                <li key={i}>
+                  <span className="example-kanji">{ex.kanji}</span>{" "}
+                  {ex.reading} — {ex.meanings.join(", ")}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3>On</h3>
+            <ul>
+              {k.reading_examples?.on?.map((ex: any, i: number) => (
+                <li key={i}>
+                  <span className="example-kanji">{ex.kanji}</span>{" "}
+                  {ex.reading} — {ex.meanings.join(", ")}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
 
-      {/* Info */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold">Meanings</h2>
-          {info.kanji.main_meanings &&
-          <p>{info.kanji.main_meanings.join(", ")}</p>
-          }
-          <h2 className="text-xl font-semibold">On Readings</h2>
-          <p>{info.kanji.main_readings.on.join(", ") || "—"}</p>
-
-          <h2 className="text-xl font-semibold">Kun Readings</h2>
-          <p>{info.kanji.main_readings.on.join(", ") || "—"}</p>
+      {/* Modal for enlarged stroke order */}
+      {isModalOpen && (
+        <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="close-btn" onClick={() => setIsModalOpen(false)}>
+              ✕
+            </button>
+            <img
+              src={strokeOrderPath!}
+              alt={`Stroke order for ${k.kanji}`}
+              className="modal-img"
+            />
+          </div>
         </div>
-
-        {/* Stroke Order SVG */}
-        <div className="flex flex-col items-center">
-          <h2 className="text-xl font-semibold mb-2">Stroke Order</h2>
-          {/* <img
-            src={""}
-            alt={`Stroke order for ${info.kanji.kanji}`}
-            className="w-full max-w-lg border rounded-lg shadow"
-          /> */}
+      )}
+       {/* Big Kanji */}
+      <div id = "right-col">
+        <div id="big-kanji">
+          {k?.kanji || k?.literal || "?"}
+        </div>
+      {/* Stroke order */}
+        <div id="stroke">
+          <h2 style={{alignItems:"center"}}>Stroke order</h2>
+          {strokeOrderPath ? (
+            <img
+              width={"300px"}
+              height={"300px"}
+              src={strokeOrderPath}
+              alt={`Stroke order for ${k.kanji}`}
+              id="stroke-order"
+              onClick={() => setIsModalOpen(true)} // open modal when clicked
+              style={{ cursor: "pointer" }}
+            />
+          ) : (
+            <p>—</p>
+          )}
         </div>
       </div>
     </div>
