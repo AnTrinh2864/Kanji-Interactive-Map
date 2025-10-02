@@ -8,7 +8,7 @@ import "./App.css";
 function App() {
   const [selectedKanji, setSelectedKanji] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<"explorer" | "details" | "partlink">("explorer");
-
+  const [loading, setLoading] = useState(false);
   return (
     <div className="h-screen flex flex-col">
       {/* Navbar */}
@@ -38,10 +38,10 @@ function App() {
         {activeTab === "explorer" && (
           <div className="h-full flex flex-col">
             <div className="p-4 border-b">
-              <SearchBar onSelect={setSelectedKanji} />
+              <SearchBar onSelect={setSelectedKanji} loading={loading} setLoading={setLoading} />
             </div>
             <div className="flex-1 h-full">
-              <KanjiBoard selectedKanji={selectedKanji} />
+              <KanjiBoard selectedKanji={selectedKanji} loading ={loading}/>
             </div>
           </div>
         )}
@@ -49,10 +49,10 @@ function App() {
         {activeTab === "details" && (
           <div className="p-6">
             <div className="p-4 border-b">
-              <SearchBar onSelect={setSelectedKanji} />
+              <SearchBar onSelect={setSelectedKanji} loading={loading} setLoading={setLoading}/>
             </div>
             {selectedKanji ? (
-              <KanjiDetail literal={selectedKanji.kanji} />
+              <KanjiDetail literal={selectedKanji.kanji}/>
             ) : (
               <div className="text-center text-gray-500 mt-20">
                 Select a kanji first to see details.

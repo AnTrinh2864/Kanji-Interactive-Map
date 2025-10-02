@@ -19,7 +19,12 @@ export function KanjiDetail({ literal }: { literal: string }) {
   }, [literal]);
 
   if (!info) {
-    return <div id="loading">Loading kanji...</div>;
+    return (
+      <div id="loading-overlay">
+        <div id="loading-kanji">漢</div>
+        <p id="loading-text">Fetching kanji details...</p>
+      </div>
+    );
   }
 
   const k = info.kanji;

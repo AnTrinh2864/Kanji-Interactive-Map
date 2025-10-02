@@ -3,10 +3,13 @@ import { useEffect, useState } from "react";
 import { fetchKanji } from "@/api/kanjiApi";
 import "./SearchBar.css"; // add styles for modal here
 
-export function SearchBar({ onSelect }: { onSelect: (k: any) => void }) {
+export function SearchBar({ onSelect, loading, setLoading }: { 
+  onSelect: (k: any) => void
+  loading: boolean
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+}) {
   const [query, setQuery] = useState("");
   const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
 
   const handleSearch = async (value: string) => {

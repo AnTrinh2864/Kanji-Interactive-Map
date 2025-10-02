@@ -34,3 +34,45 @@
 .reset-btn:hover {
   background: #2563eb;
 }
+
+/* Loading screen backdrop */
+#loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 20;
+  font-family: "Noto Serif JP", serif;
+}
+
+/* Spinning kanji */
+#loading-kanji {
+  font-size: 6rem;
+  font-weight: bold;
+  color: #2d3748;
+  animation: spin 2s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* Loading text */
+#loading-text {
+  font-size: 1.25rem;
+  color: #4a5568;
+  letter-spacing: 0.05em;
+}
+
+/* Spin animation */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.1);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+  }
+}

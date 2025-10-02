@@ -29,27 +29,32 @@ export function PartLinkBoard() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [showModal, setShowModal] = useState<null | "win" | "lose">(null);
+  const [loading, setLoading] = useState(false);
 
   // 🎲 fetch one random kanji as main
-  const loadMainKanji = async () => {
-    setCorrectCount(0);
-    setIncorrectCount(0);
-    setEdges([]);
-    setNodes([]);
-    setShowModal(null);
+ const loadMainKanji = async () => {
+  setLoading(true);   // start loading
+  setCorrectCount(0);
+  setIncorrectCount(0);
+  setEdges([]);
+  setNodes([]);
+  setShowModal(null);
 
-    const choice = sample[Math.floor(Math.random() * sample.length)];
-    let choice1 = sample[Math.floor(Math.random() * sample.length)];
-    let choice2 = sample[Math.floor(Math.random() * sample.length)];
-    while (choice1 === choice) {
-       choice1 = sample[Math.floor(Math.random() * sample.length)];
-    }
-    while (choice2 === choice) {
-       choice2 = sample[Math.floor(Math.random() * sample.length)];
-    }
+  const choice = sample[Math.floor(Math.random() * sample.length)];
+  let choice1 = sample[Math.floor(Math.random() * sample.length)];
+  let choice2 = sample[Math.floor(Math.random() * sample.length)];
+  while (choice1 === choice) {
+    choice1 = sample[Math.floor(Math.random() * sample.length)];
+  }
+  while (choice2 === choice) {
+    choice2 = sample[Math.floor(Math.random() * sample.length)];
+  }
+
+  try {
     const kinfo = await fetchKanji(choice);
     const kinfo1 = await fetchKanji(choice1);
     const kinfo2 = await fetchKanji(choice2);
+
     const parts1 = kinfo1?.kanji?.radical?.parts ?? [];
     const parts2 = kinfo2?.kanji?.radical?.parts ?? [];
     const kanjiData = kinfo?.kanji || { kanji: choice, meaning: "?" };
@@ -57,7 +62,7 @@ export function PartLinkBoard() {
 
     const mainNode = {
       id: "main",
-      data: { label: `${kanjiData.kanji} (${kanjiData.main_meanings[0] ?? ""})`, type: "main" },
+      data: { label: `${kanjiData.kanji} (${kanjiData.main_meanings?.[0] ?? ""})`, type: "main" },
       position: { x: 400, y: 250 },
       className: "kanji-node",
       style: { border: "2px solid green", padding: "8px" },
@@ -66,22 +71,42 @@ export function PartLinkBoard() {
     const correctParts = kanjiData.radical?.parts ?? [];
     setTotalCorrectParts(correctParts.length);
 
-    // parts: actual parts + distractors
     let parts = [...correctParts, ...parts1, ...parts2];
-    let shuffled = parts.sort(() => 0.5 - Math.random()).slice(0, 10);
+    parts.slice(0,10);
+    let shuffled = parts.sort(() => 0.5 - Math.random());
     if (shuffled.length < 10) {
-        shuffled = [...shuffled, "火", "水", "人", "口", "心"]
+      shuffled = [...shuffled, "火", "水", "人", "口", "心"];
     }
-    const partNodes = shuffled.map((p: any, i: number) => ({
+    shuffled = shuffled.sort(() => 0.5 - Math.random());
+
+    const partInfos = await Promise.all(
+      shuffled.map(async (p) => {
+        try {
+          const info = await fetchKanji(p);
+          const meaning =
+            Array.isArray(info.kanji?.main_meanings)
+              ? info.kanji.main_meanings[0]
+              : info.kanji?.main_meaning || "?";
+          return { kanji: p, meaning };
+        } catch {
+          return { kanji: p, meaning: "?" };
+        }
+      })
+    );
+
+    const partNodes = partInfos.map((p, i) => ({
       id: `part-${i}`,
-      data: { label: p, type: "part" },
+      data: { label: `${p.kanji} (${p.meaning})`, type: "part" },
       position: { x: 100 + i * 70, y: 50 + (i % 2) * 100 },
       className: "part-node",
       style: { border: "1px solid gray", padding: "6px" },
     }));
 
     setNodes([mainNode, ...partNodes]);
-  };
+  } finally {
+    setLoading(false);  // stop loading regardless of success/fail
+  }
+};
 
   useEffect(() => {
     loadMainKanji();
@@ -128,26 +153,34 @@ export function PartLinkBoard() {
         <button onClick={loadMainKanji}>Reset</button>
       </div>
 
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        onNodesChange={onNodesChange}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        fitView
-      >
-        <MiniMap
-          nodeColor={(node) => {
-            if (node.className?.includes("kanji-node")) return "#10b981";
-            if (node.className?.includes("part-node")) return "#3b82f6";
-            return "#999";
-          }}
-          zoomable
-          pannable
-        />
-        <Controls />
-        <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
-      </ReactFlow>
+      {loading ? (
+        <div id="loading-overlay">
+          <div id="loading-kanji">漢</div>
+          <p id="loading-text">Loading kanji...</p>
+        </div>
+      ) : (
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          onNodesChange={onNodesChange}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          fitView
+        >
+          <MiniMap
+            nodeColor={(node) => {
+              if (node.className?.includes("kanji-node")) return "#10b981";
+              if (node.className?.includes("part-node")) return "#3b82f6";
+              return "#999";
+            }}
+            zoomable
+            pannable
+          />
+          <Controls />
+          <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
+        </ReactFlow>
+      )}
+
 
       {/* 🎉 Win/Lose Modal */}
       {showModal && (

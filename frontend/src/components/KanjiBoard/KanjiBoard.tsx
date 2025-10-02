@@ -23,7 +23,7 @@ type KanjiData = {
   strokes?: number;
 };
 
-export function KanjiBoard({ selectedKanji }: { selectedKanji: KanjiData | null }) {
+export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiData | null, loading:boolean }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
@@ -41,7 +41,7 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: KanjiData | null 
       {
         id,
         data: {
-          label: id,
+          label: `${id}/n${kanji.meaning}`,
           meaning: kanji.meaning,
           meanings: kanji.meanings,
           radical: kanji.radical,
@@ -74,7 +74,7 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: KanjiData | null 
         ...nds,
         {
           id: partId,
-          data: { label: p, type: "part" },
+          data: { label: `${p}`, type: "part" },
           position: { x: baseX + i * 80, y: baseY + i * 40 },
            className: "part-node",
         },
@@ -174,7 +174,78 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: KanjiData | null 
     setEdges((eds) => eds.filter((e) => e.source !== node.id && e.target !== node.id));
   };
 
+  // inside KanjiBoard component
+
+  const handleReset = () => {
+    setNodes([]);
+    setEdges([]);
+  };
+
+const handleOrganize = () => {
+  if (nodes.length === 0) return;
+
+  const centerX = 600;
+  const centerY = 300;
+
+  // Count edges per node
+  const degreeMap: Record<string, number> = {};
+  edges.forEach((e) => {
+    degreeMap[e.source] = (degreeMap[e.source] || 0) + 1;
+    degreeMap[e.target] = (degreeMap[e.target] || 0) + 1;
+  });
+
+  // Group nodes by degree
+  const degreeGroups: Record<number, typeof nodes> = {};
+  nodes.forEach((node) => {
+    const degree = degreeMap[node.id] || 0;
+    if (!degreeGroups[degree]) degreeGroups[degree] = [];
+    degreeGroups[degree].push(node);
+  });
+
+  // Sort degrees descending
+  const sortedDegrees = Object.keys(degreeGroups)
+    .map(Number)
+    .sort((a, b) => b - a);
+
+  const arrangedNodes: typeof nodes = [];
+  const baseRadius = 200;  // radius of first ring
+  const ringSpacing = 100; // distance between rings
+  let ringIndex = 0;
+
+  sortedDegrees.forEach((deg) => {
+    const group = degreeGroups[deg];
+    const radius = ringIndex === 0 ? 0 : baseRadius + (ringIndex - 1) * ringSpacing;
+
+    group.forEach((node, i) => {
+      const angle = (2 * Math.PI * i) / group.length;
+      arrangedNodes.push({
+        ...node,
+        position: {
+          x: centerX + radius * Math.cos(angle),
+          y: centerY + radius * Math.sin(angle),
+        },
+      });
+    });
+
+    ringIndex++;
+  });
+
+  setNodes(arrangedNodes);
+};
+
+
   return (
+    <div>
+    {loading ? (
+      <div id="loading-overlay">
+        <div id="loading-spinner">{selectedKanji?.kanji ?? "漢"}</div>
+        <p id="loading-text">Loading kanji...</p>
+      </div>  
+    ):(<div/>)}
+    <div className="board-controls">
+      <button onClick={handleReset}>Reset</button>
+      <button onClick={handleOrganize}>Organize</button>
+    </div>
     <animated.div style={springs} className="Board">
     <ReactFlow
       nodes={nodes}
@@ -201,5 +272,6 @@ export function KanjiBoard({ selectedKanji }: { selectedKanji: KanjiData | null 
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
       </ReactFlow>
     </animated.div>
+    </div>
   );
 }
