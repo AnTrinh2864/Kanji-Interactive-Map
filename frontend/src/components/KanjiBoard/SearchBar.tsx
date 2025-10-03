@@ -38,6 +38,13 @@ export function SearchBar({ onSelect, loading, setLoading }: {
   }, [suggestions]);
 
   return (
+    <div>
+    {loading ? (
+      <div id="loading-overlay">
+        <div id="loading-spinner">{"漢"}</div>
+        <p id="loading-text">Loading kanji...</p>
+      </div>  
+    ):(<div/>)}
     <div id="searchbar-container">
       <div id="searchbar-input-row">
         <input
@@ -92,6 +99,7 @@ export function SearchBar({ onSelect, loading, setLoading }: {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

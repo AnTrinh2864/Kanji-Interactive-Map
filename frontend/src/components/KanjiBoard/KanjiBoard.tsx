@@ -41,7 +41,7 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
       {
         id,
         data: {
-          label: `${id}/n${kanji.meaning}`,
+          label: `${id} - ${kanji.meaning}`,
           meaning: kanji.meaning,
           meanings: kanji.meanings,
           radical: kanji.radical,
@@ -66,10 +66,12 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
     const baseX = Math.random() * 400;
     const baseY = Math.random() * 400;
 
-    parts.forEach((p, i) => {
+    parts.forEach(async (p, i) => {
       const partId = `${p}`;
+      const data = await fetchKanji(p);
+      console.log("Part data: ")
+      console.log(data.kanji)
       if (nodes.find((n) => n.id === partId)) return;
-
       setNodes((nds) => [
         ...nds,
         {
@@ -87,7 +89,7 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
     });
   };
 
- const addRelated = (partId: string, kanjis: (KanjiData | string)[], page: number) => {
+ const addRelated = (partId: string, kanjis: (KanjiData | string)[], page: number, meaning: string) => {
   const baseX = Math.random() * 400;
   const baseY = Math.random() * 400;
 
@@ -102,12 +104,13 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
 
     // 🔍 fetch full kanji info
     const kanjiInfo = await fetchKanji(label);
+    const name = `${label}-${kanjiInfo.kanji.main_meanings[0]}`
     setNodes((nds) => [
       ...nds,
       {
         id: kid,
         data: {
-          label,
+          label: name,
           type: "kanji",
           kanji: label,
           radical: kanjiInfo?.kanji.radical,
@@ -149,7 +152,8 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
       const pageSize = 9;
       const page = 0;
       const nextBatch = (data?.kanji_list ?? []).slice(page * pageSize, (page + 1) * pageSize);
-      addRelated(node.id, nextBatch, page);
+      const meaning = data?.meaning ?? ""
+      addRelated(node.id, nextBatch, page,meaning );
     });
   } else if (node.data.type === "more") {
     console.log("type: " + node.data.type)
@@ -162,7 +166,8 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
     fetchRelated(partId).then((data) => {
       const pageSize = 9;
       const nextBatch = (data?.kanji_list ?? []).slice(page * pageSize, (page + 1) * pageSize);
-      addRelated(partId, nextBatch, page);
+      const meaning = data?.meaning ?? ""
+      addRelated(partId, nextBatch, page, meaning);
     });
   }
 };

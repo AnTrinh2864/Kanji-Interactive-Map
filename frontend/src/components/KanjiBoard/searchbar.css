@@ -93,3 +93,60 @@
 .modal-close:hover {
   background: #c53030;
 }
+
+#loading-overlay {
+  position: absolute; /* so it only covers the board container */
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent; /* light tint */
+  backdrop-filter: blur(6px);           /* 🔥 blur effect */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 50; /* above the board, below nav */
+  border-radius: 8px; /* optional, match board styling */
+}
+
+
+#loading-spinner {
+  font-size: 6rem;
+  animation: spin 2s linear infinite;
+  color: #26472b;
+}
+
+#loading-text {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  color: #2d3b2a;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.board-controls {
+  position: absolute;
+  top: 90px;
+  left: 10px;
+  display: flex;
+  gap: 10px;
+  z-index: 120;
+}
+
+.board-controls button {
+  background: #26472b;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.board-controls button:hover {
+  background: #366b3e;
+}

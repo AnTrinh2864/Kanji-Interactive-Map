@@ -18,3 +18,18 @@ export async function fetchRelated(part: string, page: number = 0) {
   console.log(res.data)
   return res.data;
 }
+
+export async function saveGame(userId: number, mainKanji: any, won: boolean) {
+  await fetch("http://localhost:8000/save_game", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      user_id: userId,
+      main_kanji: mainKanji.kanji,
+      meaning: mainKanji.meaning,
+      correct_parts: mainKanji.radical?.parts ?? [],
+      details: mainKanji,
+      won
+    })
+  });
+}
