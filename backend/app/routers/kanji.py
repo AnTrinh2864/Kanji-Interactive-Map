@@ -2,10 +2,11 @@ from fastapi import APIRouter, HTTPException
 from jisho_api.word import Word
 from jisho_api.kanji import Kanji
 from pymongo import MongoClient
+from dotenv import load_dotenv
 import os
 
 router = APIRouter()
-
+load_dotenv()
 # Mongo setup
 MONGO_USER = os.getenv("DB_USERNAME")
 MONGO_PASS = os.getenv("DB_PASSWORD")

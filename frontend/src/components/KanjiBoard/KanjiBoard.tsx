@@ -69,14 +69,12 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
     parts.forEach(async (p, i) => {
       const partId = `${p}`;
       const data = await fetchKanji(p);
-      console.log("Part data: ")
-      console.log(data.kanji)
       if (nodes.find((n) => n.id === partId)) return;
       setNodes((nds) => [
         ...nds,
         {
           id: partId,
-          data: { label: `${p}`, type: "part" },
+          data: { label: `${p}-${data.kanji.main_meanings[0]}`, type: "part" },
           position: { x: baseX + i * 80, y: baseY + i * 40 },
            className: "part-node",
         },
@@ -148,7 +146,7 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
   } else if (node.data.type === "part") {
     console.log("type: " + node.data.type)
     console.log("label: " + node.data.label)
-    fetchRelated(node.data.label).then((data) => {
+    fetchRelated(node.data.label.split('-')[0]).then((data) => {
       const pageSize = 9;
       const page = 0;
       const nextBatch = (data?.kanji_list ?? []).slice(page * pageSize, (page + 1) * pageSize);

@@ -20,6 +20,10 @@ type KanjiData = {
   meanings?: string[];
   radical?: { parts?: string[] };
   main_meanings?: string[];
+  main_readings?: {
+    kun?: string[],
+    on?: string[]
+  };
 };
 
 // const token = localStorage.getItem("token");
@@ -47,16 +51,19 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
       return;
     }
     if (!mainKanji) return;
-
-    const payload = {
-      user_id: currentUser.id,
+    const kanji = {
       kanji: mainKanji.kanji,
-      meaning: mainKanji.main_meanings?.[0] ?? mainKanji.meaning,
-      parts: mainKanji.radical?.parts ?? [],
+      meaning: mainKanji.main_meanings?.[0] ?? "",
+      reading: mainKanji.main_readings?.kun?.[0] ?? "",
+      parts: mainKanji.radical?.parts ?? []
+    }
+    const payload = {
+      user_id: 1,
+      kanji: kanji
     };
 
     try {
-      const res = await fetch("http://localhost:8000/save_kanji", {
+      const res = await fetch("http://localhost:8000/api/save_kanji", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

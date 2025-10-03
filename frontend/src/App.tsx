@@ -30,7 +30,8 @@ function App() {
 
         // save JWT
         localStorage.setItem("token", data.access_token);
-        setCurrentUser({ username: form.username }); // store username locally
+        console.log(data)
+        setCurrentUser(data); // store username locally
       } else {
         const err = await res.json();
         alert(err.detail || "Auth failed");

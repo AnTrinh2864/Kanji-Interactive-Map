@@ -2,11 +2,11 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import Base, engine
-from app.routers import kanji, saved, auth
+from app.routers import kanji, saved
 from app import models
 
 # Create tables
-Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -22,4 +22,3 @@ app.add_middleware(
 # Routers
 app.include_router(kanji.router)
 app.include_router(saved.router)
-app.include_router(auth.router)

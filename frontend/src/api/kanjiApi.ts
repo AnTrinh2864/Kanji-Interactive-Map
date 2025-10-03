@@ -20,7 +20,7 @@ export async function fetchRelated(part: string, page: number = 0) {
 }
 
 export async function saveGame(userId: number, mainKanji: any, won: boolean) {
-  await fetch("http://localhost:8000/save_game", {
+  await fetch("http://localhost:8000/api/save_game", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
