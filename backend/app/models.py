@@ -19,7 +19,6 @@ class User(Base):
 
     kanjis = relationship("Kanji", secondary=user_kanji, back_populates="users")
 
-
 class Kanji(Base):
     __tablename__ = "kanjis"
     id = Column(Integer, primary_key=True, index=True)
@@ -29,12 +28,10 @@ class Kanji(Base):
     parts = relationship("Part", back_populates="kanji")
     users = relationship("User", secondary=user_kanji, back_populates="kanjis")
 
-
 class Part(Base):
     __tablename__ = "parts"
     id = Column(Integer, primary_key=True, index=True)
     part = Column(String)
     part_meaning = Column(String, nullable=True)
-
     kanji_id = Column(Integer, ForeignKey("kanjis.id"))
     kanji = relationship("Kanji", back_populates="parts")

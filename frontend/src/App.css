@@ -1,46 +1,52 @@
-#root {
-  max-width: 1280px;
+/* Root container */
+#app-root {
+  max-width: 1240px;
   margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  height: 96vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Auth container */
+#auth-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  gap: 1rem;
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+#auth-container input {
+  padding: 0.5rem 1rem;
+  font-size: 1rem;
+  width: 200px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+#auth-container button {
+  padding: 0.5rem 1.5rem;
+  font-size: 1rem;
+  background-color: #3d613c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
-.card {
-  padding: 2em;
+#auth-container button:hover {
+  background-color: #54784b;
 }
 
-.read-the-docs {
-  color: #888;
+#auth-container p {
+  cursor: pointer;
+  color: #3d613c;
 }
-/* Navbar container */
+
+/* Navbar */
 #navbar {
-  background-color: #3d613c; /* dark gray (like Tailwind bg-gray-800) */
+  background-color: #3d613c;
   display: flex;
   gap: 1rem;
   padding: 0 1rem;
@@ -49,11 +55,10 @@
   z-index: 50;
 }
 
-/* Tab style */
 #navbar .tab {
   background: transparent;
   border: none;
-  color: #f1edde; /* gray-300 */
+  color: #f1edde;
   font-size: 1rem;
   padding: 0.75rem 1.25rem;
   cursor: pointer;
@@ -61,14 +66,67 @@
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Hover effect */
 #navbar .tab:hover {
-  color: #ffffff; /* yellow-400 */
+  color: #ffffff;
 }
 
-/* Active tab */
 #navbar .tab.active {
-  color: #ffffff; /* white */
+  color: #ffffff;
   font-weight: bold;
-  border-bottom: 3px solid #ffffff; /* highlight */
+  border-bottom: 5px solid #c8e6c7;
+}
+
+#current-user {
+  margin-left: auto;
+  color: #f1edde;
+  font-size:xx-large;
+}
+
+/* Main Content */
+#main-content {
+  flex: 1;
+  overflow: auto;
+}
+
+/* Tabs */
+#explorer-tab,
+#details-tab,
+#partlink-tab {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search Bar Container */
+#search-container {
+  padding: 1rem;
+  border: 1px solid #ccc;
+}
+
+/* Kanji Board Container */
+#kanji-board-container {
+  flex: 1;
+  overflow: auto;
+}
+
+/* Select Kanji Message */
+#select-kanji-msg {
+  text-align: center;
+  margin-top: 5rem;
+  color: #888;
+}
+#saved-kanjis-tab h2 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.saved-kanji-card {
+  background: #f9f9f9;
+  border-bottom: 1px solid #888;
+  transition: transform 0.2s;
+}
+
+.saved-kanji-card:hover {
+  transform: translateY(-4px);
 }

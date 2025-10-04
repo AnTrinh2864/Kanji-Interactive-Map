@@ -6,30 +6,25 @@ class PartBase(BaseModel):
     part: str
     part_meaning: Optional[str] = None
 
-class PartCreate(PartBase):
-    pass
-
 class Part(PartBase):
     id: int
     class Config:
         orm_mode = True
 
-
 # -------- KANJI SCHEMAS --------
 class KanjiBase(BaseModel):
     kanji: str
     meaning: str = ""
-    reading: str = ""  # <-- added reading
+    reading: str = ""
 
 class KanjiCreate(KanjiBase):
-    parts: List[str] = []   # <-- just strings, not Part objects
+    parts: List[str] = []
 
 class Kanji(KanjiBase):
     id: int
-    parts: List[str] = []  # response will expand into Part objects
+    parts: List[str] = []
     class Config:
         orm_mode = True
-
 
 # -------- USER SCHEMAS --------
 class UserBase(BaseModel):
@@ -40,16 +35,13 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    kanjis: List[Kanji] = []
     class Config:
         orm_mode = True
-
 
 # -------- AUTH --------
 class AuthRequest(BaseModel):
     username: str
     password: str
-
 
 # -------- SAVE KANJI REQUEST --------
 class SaveKanjiRequest(BaseModel):

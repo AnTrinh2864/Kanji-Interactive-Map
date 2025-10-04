@@ -11,7 +11,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { fetchKanji } from "@/api/kanjiApi";
-import "./PartLinkBoard.css"; // we'll put modal css here
+import "./PartLinkBoard.css"; // modal + board styles
 import sample from "./sample";
 
 type KanjiData = {
@@ -21,18 +21,10 @@ type KanjiData = {
   radical?: { parts?: string[] };
   main_meanings?: string[];
   main_readings?: {
-    kun?: string[],
-    on?: string[]
+    kun?: string[];
+    on?: string[];
   };
 };
-
-// const token = localStorage.getItem("token");
-// await fetch("http://localhost:8000/api/some-protected-route", {
-//   headers: {
-//     "Authorization": `Bearer ${token}`,
-//   },
-// });
-
 
 export function PartLinkBoard({ currentUser }: { currentUser: any }) {
   const [correctCount, setCorrectCount] = useState(0);
@@ -45,21 +37,18 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
   const [showModal, setShowModal] = useState<null | "win" | "lose">(null);
   const [loading, setLoading] = useState(false);
 
-    const handleSave = async () => {
-    if (!currentUser) {
-      alert("You must log in to save progress.");
-      return;
-    }
-    if (!mainKanji) return;
-    const kanji = {
-      kanji: mainKanji.kanji,
-      meaning: mainKanji.main_meanings?.[0] ?? "",
-      reading: mainKanji.main_readings?.kun?.[0] ?? "",
-      parts: mainKanji.radical?.parts ?? []
-    }
+  // Save progress to backend
+  const handleSave = async () => {
+    if (!currentUser || !mainKanji) return alert("You must log in to save progress.");
+
     const payload = {
       user_id: 1,
-      kanji: kanji
+      kanji: {
+        kanji: mainKanji.kanji,
+        meaning: mainKanji.main_meanings?.[0] ?? "",
+        reading: mainKanji.main_readings?.kun?.[0] ?? mainKanji.main_readings?.on?.[0] ?? "",
+        parts: mainKanji.radical?.parts ?? [],
+      },
     };
 
     try {
@@ -68,19 +57,16 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      if (res.ok) {
-        alert("✅ Saved!");
-      } else {
-        alert("❌ Save failed.");
-      }
+      alert(res.ok ? "✅ Saved!" : "❌ Save failed.");
     } catch (e) {
       console.error("Save error", e);
       alert("❌ Save error.");
     }
   };
-  // 🎲 fetch one random kanji as main
+
+  // Load random main kanji and parts
   const loadMainKanji = async () => {
-    setLoading(true); // start loading
+    setLoading(true);
     setCorrectCount(0);
     setIncorrectCount(0);
     setEdges([]);
@@ -90,12 +76,9 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
     const choice = sample[Math.floor(Math.random() * sample.length)];
     let choice1 = sample[Math.floor(Math.random() * sample.length)];
     let choice2 = sample[Math.floor(Math.random() * sample.length)];
-    while (choice1 === choice) {
-      choice1 = sample[Math.floor(Math.random() * sample.length)];
-    }
-    while (choice2 === choice) {
-      choice2 = sample[Math.floor(Math.random() * sample.length)];
-    }
+
+    while (choice1 === choice) choice1 = sample[Math.floor(Math.random() * sample.length)];
+    while (choice2 === choice) choice2 = sample[Math.floor(Math.random() * sample.length)];
 
     try {
       const kinfo = await fetchKanji(choice);
@@ -109,11 +92,7 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
 
       const mainNode = {
         id: "main",
-        data: {
-          label: `${kanjiData.kanji} (${kanjiData.main_meanings?.[0] ?? ""})`,
-          kanji: kanjiData.kanji,
-          type: "main",
-        },
+        data: { label: `${kanjiData.kanji} (${kanjiData.main_meanings?.[0] ?? ""})`, kanji: kanjiData.kanji, type: "main" },
         position: { x: 400, y: 250 },
         className: "kanji-node",
         style: { border: "2px solid green", padding: "8px" },
@@ -122,16 +101,12 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
       const correctParts = kanjiData.radical?.parts ?? [];
       setTotalCorrectParts(correctParts.length);
 
-      let parts = [...correctParts, ...parts1, ...parts2];
-      parts.slice(0, 10);
-      let shuffled = parts.sort(() => 0.5 - Math.random());
-      if (shuffled.length < 10) {
-        shuffled = [...shuffled, "火", "水", "人", "口", "心"];
-      }
-      shuffled = shuffled.sort(() => 0.5 - Math.random());
+      let parts = [...correctParts, ...parts1, ...parts2].slice(0, 10);
+      if (parts.length < 10) parts = [...parts, "火", "水", "人", "口", "心"];
+      parts = parts.sort(() => 0.5 - Math.random());
 
       const partInfos = await Promise.all(
-        shuffled.map(async (p) => {
+        parts.map(async (p) => {
           try {
             const info = await fetchKanji(p);
             const meaning = Array.isArray(info.kanji?.main_meanings)
@@ -154,7 +129,7 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
 
       setNodes([mainNode, ...partNodes]);
     } finally {
-      setLoading(false); // stop loading regardless of success/fail
+      setLoading(false);
     }
   };
 
@@ -162,63 +137,52 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
     loadMainKanji();
   }, []);
 
-  // 🎯 check if connection is correct
+  // Handle connection logic (part → main only)
   const onConnect = useCallback(
     (params: Connection) => {
       const source = nodes.find((n) => n.id === params.source);
       const target = nodes.find((n) => n.id === params.target);
 
-      // ✅ only allow part → main
-      if (target?.id !== "main" || source?.id === "main") {
-        return; // block any other connections
-      }
+      if (target?.id !== "main" || source?.id === "main") return;
 
-      if (target?.id === "main" && source?.data.kanji) {
-        const isCorrect = mainKanji?.radical?.parts?.includes(source.data.kanji);
+      const isCorrect = mainKanji?.radical?.parts?.includes(source?.data.kanji);
 
-        if (isCorrect) {
-          setCorrectCount((c) => {
-            const newCorrect = c + 1;
-            if (newCorrect === totalCorrectParts) {
-              setShowModal("win");
-            }
-            return newCorrect;
-          });
-
-          // ✅ Only add edge if correct
-          setEdges((eds) => addEdge(params, eds));
-        } else {
-          setIncorrectCount((c) => {
-            const newIncorrect = c + 1;
-            if (newIncorrect > 3) {
-              setShowModal("lose");
-            }
-            return newIncorrect;
-          });
-
-          // ❌ Do not add edge if incorrect
-        }
+      if (isCorrect) {
+        setCorrectCount((c) => {
+          const newCorrect = c + 1;
+          if (newCorrect === totalCorrectParts) setShowModal("win");
+          return newCorrect;
+        });
+        setEdges((eds) => addEdge(params, eds));
+      } else {
+        setIncorrectCount((c) => {
+          const newIncorrect = c + 1;
+          if (newIncorrect > 3) setShowModal("lose");
+          return newIncorrect;
+        });
       }
     },
     [nodes, mainKanji, totalCorrectParts]
   );
 
-
   return (
-    <div style={{ height: "500px", width: "100%", position: "relative" }}>
+    <div id="partlink-board">
       {/* Counters + Reset */}
-      <div style={{ marginBottom: "10px", display: "flex", gap: "20px" }}>
+      <div id="board-header">
         <span>✅ Correct: {correctCount}</span>
         <span>❌ Incorrect: {incorrectCount}</span>
-        <button onClick={loadMainKanji}>Reset</button>
       </div>
 
-      {loading ? (
+      {/* Loading overlay */}
+      {loading && (
         <div id="loading-overlay">
           <div id="loading-kanji">漢</div>
           <p id="loading-text">Loading kanji...</p>
         </div>
-      ) : (
+      )}
+
+      {/* ReactFlow board */}
+      {!loading && (
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -241,17 +205,13 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
         </ReactFlow>
       )}
 
-      {/* 🎉 Win/Lose Modal */}
+      {/* Win/Lose modal */}
       {showModal && (
         <div className="modal-backdrop">
           <div className="modal-content">
             <h2>{showModal === "win" ? "🎉 You Win!" : "❌ You Lose!"}</h2>
-            <button onClick={loadMainKanji} className="reset-btn">
-              Reset Game
-            </button>
-            <button onClick={handleSave} className="save-btn">
-              Save Progress
-            </button>
+            <button onClick={loadMainKanji} className="reset-btn">Reset Game</button>
+            <button onClick={handleSave} className="save-btn">Save Progress</button>
           </div>
         </div>
       )}

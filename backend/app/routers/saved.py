@@ -1,11 +1,12 @@
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from app import models, schemas
 from app.database import SessionLocal
 from app.routers.auth import hash_password, verify_password
 
 router = APIRouter()
+
 # DB dependency
 def get_db():
     db = SessionLocal()
@@ -29,7 +30,7 @@ def signup(user: schemas.UserCreate, db: Session = Depends(get_db)):
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
-    return new_user
+    return {"id": new_user.id, "username": new_user.username}
 
 
 @router.post("/api/login", response_model=schemas.User)
@@ -37,9 +38,10 @@ def login(auth: schemas.AuthRequest, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.username == auth.username).first()
     if not db_user or not verify_password(auth.password, db_user.hashed_password):
         raise HTTPException(status_code=400, detail="Invalid username or password")
-    return db_user
+    return {"id": db_user.id, "username": db_user.username}
 
 
+# ========== SAVE KANJI ==========
 @router.post("/api/save_kanji", response_model=schemas.Kanji)
 def save_kanji(request: schemas.SaveKanjiRequest, db: Session = Depends(get_db)):
     db_user = db.query(models.User).filter(models.User.id == request.user_id).first()
@@ -48,11 +50,10 @@ def save_kanji(request: schemas.SaveKanjiRequest, db: Session = Depends(get_db))
 
     kanji_data = request.kanji
 
-    # 🔎 Check if kanji already exists in DB
+    # Check if kanji exists
     db_kanji = db.query(models.Kanji).filter(models.Kanji.kanji == kanji_data.kanji).first()
 
     if not db_kanji:
-        # Create new Kanji entry if it doesn't exist
         db_kanji = models.Kanji(
             kanji=kanji_data.kanji,
             meaning=kanji_data.meaning,
@@ -69,12 +70,12 @@ def save_kanji(request: schemas.SaveKanjiRequest, db: Session = Depends(get_db))
         db.commit()
         db.refresh(db_kanji)
 
-    # 🔎 Ensure user doesn't already have this kanji
+    # Append kanji to user if not exists
     if db_kanji not in db_user.kanjis:
         db_user.kanjis.append(db_kanji)
         db.commit()
+        db.refresh(db_user)
 
-    # ✅ Convert ORM → schema (parts as list of strings)
     return schemas.Kanji(
         id=db_kanji.id,
         kanji=db_kanji.kanji,
@@ -84,22 +85,22 @@ def save_kanji(request: schemas.SaveKanjiRequest, db: Session = Depends(get_db))
     )
 
 
+# ========== GET SAVED KANJIS ==========
 @router.get("/api/users/{user_id}/kanjis", response_model=List[schemas.Kanji])
 def get_saved_kanjis(user_id: int, db: Session = Depends(get_db)):
-    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    db_user = db.query(models.User)\
+        .options(joinedload(models.User.kanjis).joinedload(models.Kanji.parts))\
+        .filter(models.User.id == user_id).first()
     if not db_user:
         raise HTTPException(status_code=404, detail="User not found")
 
-    result = []
-    for k in db_user.kanjis:
-        result.append(
-            schemas.Kanji(
-                id=k.id,
-                kanji=k.kanji,
-                meaning=k.meaning,
-                reading=k.reading,
-                parts=[p.part for p in k.parts]  # flatten Part objects into strings
-            )
-        )
-
+    result = [
+        schemas.Kanji(
+            id=k.id,
+            kanji=k.kanji,
+            meaning=k.meaning,
+            reading=k.reading,
+            parts=[p.part for p in k.parts]
+        ) for k in db_user.kanjis
+    ]
     return result

@@ -33,3 +33,30 @@ export async function saveGame(userId: number, mainKanji: any, won: boolean) {
     })
   });
 }
+export type SavedKanji = {
+  id: number;
+  kanji: string;
+  meaning?: string;
+  reading?: string;
+  parts?: string[];
+};
+
+export async function fetchSavedKanjis(userId: number): Promise<SavedKanji[]> {
+  const token = localStorage.getItem("token");
+  try {
+    const res = await fetch(`http://localhost:8000/api/users/${userId}/kanjis`, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!res.ok) {
+      throw new Error("Failed to fetch saved kanjis");
+    }
+    const data = await res.json();
+    return data;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+}

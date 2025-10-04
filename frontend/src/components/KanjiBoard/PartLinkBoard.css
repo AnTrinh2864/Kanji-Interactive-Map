@@ -1,3 +1,32 @@
+#partlink-board {
+  height: 500px;
+  width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header with counters */
+#board-header {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+
+#board-header button {
+  padding: 0.5rem 1rem;
+  background: #3d613c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+#board-header button:hover {
+  background: #54784b;
+}
+
+/* Modal backdrop & content */
 .modal-backdrop {
   position: absolute;
   inset: 0;
@@ -29,26 +58,39 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.2s;
+  margin-right: 1rem;
+  margin-top: 1rem;
 }
-
 .reset-btn:hover {
   background: #2563eb;
 }
 
-/* Loading screen backdrop */
+.save-btn {
+  background: #10b981;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.save-btn:hover {
+  background: #047857;
+}
+
+/* Loading overlay */
 #loading-overlay {
   position: absolute;
   inset: 0;
   background: rgba(255, 255, 255, 0.9);
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
   z-index: 20;
   font-family: "Noto Serif JP", serif;
 }
 
-/* Spinning kanji */
 #loading-kanji {
   font-size: 6rem;
   font-weight: bold;
@@ -57,22 +99,14 @@
   margin-bottom: 1rem;
 }
 
-/* Loading text */
 #loading-text {
   font-size: 1.25rem;
   color: #4a5568;
   letter-spacing: 0.05em;
 }
 
-/* Spin animation */
 @keyframes spin {
-  0% {
-    transform: rotate(0deg) scale(1);
-  }
-  50% {
-    transform: rotate(180deg) scale(1.1);
-  }
-  100% {
-    transform: rotate(360deg) scale(1);
-  }
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
 }
