@@ -104,3 +104,43 @@ def get_saved_kanjis(user_id: int, db: Session = Depends(get_db)):
         ) for k in db_user.kanjis
     ]
     return result
+
+from fastapi import status
+
+# ========== DELETE SAVED KANJI ==========
+@router.delete("/api/users/{user_id}/kanjis/{kanji_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_saved_kanji(user_id: int, kanji_id: int, db: Session = Depends(get_db)):
+    """
+    Removes a specific saved kanji from a user's saved list.
+    Does NOT delete the kanji from the global Kanji table unless orphaned.
+    """
+    # 1️⃣ Check user existence
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # 2️⃣ Check kanji existence
+    db_kanji = db.query(models.Kanji).filter(models.Kanji.id == kanji_id).first()
+    if not db_kanji:
+        raise HTTPException(status_code=404, detail="Kanji not found")
+
+    # 3️⃣ Check if user has this kanji saved
+    if db_kanji not in db_user.kanjis:
+        raise HTTPException(status_code=400, detail="Kanji not saved by this user")
+
+    # 4️⃣ Remove relationship
+    db_user.kanjis.remove(db_kanji)
+    db.commit()
+
+    # 5️⃣ Optional cleanup — delete kanji if no users have it saved
+    users_with_kanji = (
+        db.query(models.User)
+        .join(models.User.kanjis)
+        .filter(models.Kanji.id == kanji_id)
+        .count()
+    )
+    if users_with_kanji == 0:
+        db.delete(db_kanji)
+        db.commit()
+
+    return {"detail": "Kanji removed successfully"}

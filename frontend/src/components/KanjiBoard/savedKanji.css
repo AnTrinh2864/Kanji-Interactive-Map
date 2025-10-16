@@ -1,0 +1,57 @@
+.saved-kanji-card {
+  position: relative;
+  background-color: #fff;
+  border: 1px solid #e2e8f0; /* subtle gray border */
+  border-radius: 0.75rem; /* rounded corners */
+  padding: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.saved-kanji-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Delete (X) button */
+.saved-kanji-card button {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.6rem;
+  background: transparent;
+  border: none;
+  font-size: 1.25rem;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.saved-kanji-card button:hover {
+  color: #e11d48; /* red-600 */
+  transform: scale(1.2);
+}
+
+.saved-kanji-card button:disabled {
+  color: #bbb;
+  cursor: not-allowed;
+}
+
+/* Kanji content layout */
+.saved-kanji-card .text-4xl {
+  font-size: 2.5rem;
+  text-align: center;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.saved-kanji-card .text-gray-600 {
+  font-size: 0.95rem;
+}
+
+.saved-kanji-card .text-gray-500 {
+  font-size: 0.9rem;
+}
+
+.saved-kanji-card .text-gray-400 {
+  font-size: 0.8rem;
+}

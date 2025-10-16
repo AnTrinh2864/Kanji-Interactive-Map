@@ -3,7 +3,7 @@ import axios from "axios";
 const API_BASE = "http://127.0.0.1:8000/api";
 
 // 🔍 Search kanji or words
-export async function fetchKanji(query: string) {
+export async function fetchKanji(query: string, options: { signal?: AbortSignal } = {}) {
   const res = await axios.get(`${API_BASE}/kanji/${encodeURIComponent(query)}`);
   return res.data;
 }
@@ -58,5 +58,14 @@ export async function fetchSavedKanjis(userId: number): Promise<SavedKanji[]> {
   } catch (e) {
     console.error(e);
     return [];
+  }
+}
+export async function deleteSavedKanji(userId: number, kanjiId: number) {
+  try {
+    const res = await axios.delete(`${API_BASE}/users/${userId}/kanjis/${kanjiId}`);
+    return res.data;
+  } catch (err: any) {
+    console.error("❌ Failed to delete saved kanji:", err.response?.data || err.message);
+    throw err;
   }
 }

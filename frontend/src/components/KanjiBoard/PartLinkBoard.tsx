@@ -42,7 +42,7 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
     if (!currentUser || !mainKanji) return alert("You must log in to save progress.");
 
     const payload = {
-      user_id: 1,
+      user_id: currentUser.id,
       kanji: {
         kanji: mainKanji.kanji,
         meaning: mainKanji.main_meanings?.[0] ?? "",

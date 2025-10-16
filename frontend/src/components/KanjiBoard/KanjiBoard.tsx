@@ -29,19 +29,24 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
 
   // Animated entry
   const springs = useSpring({ opacity: 1, from: { opacity: 0 } });
+  const hasKanjiNode = (kanjiChar: string) =>
+  nodes.some((n) => {
+    const nodeKanji = n.data?.label?.split("-")[0];
+    return nodeKanji === kanjiChar;
+  });
 
   const addKanji = (kanji: KanjiData) => {
     if (!kanji?.kanji) return;
 
     const id = kanji.kanji;
     if (nodes.find((n) => n.id === id)) return;
-
+    if (hasKanjiNode(id)) return;
     setNodes((nds) => [
       ...nds,
       {
         id,
         data: {
-          label: `${id} - ${kanji.meaning}`,
+          label: `${id}-${kanji.meaning}`,
           meaning: kanji.meaning,
           meanings: kanji.meanings,
           radical: kanji.radical,
@@ -69,12 +74,13 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
     parts.forEach(async (p, i) => {
       const partId = `${p}`;
       const data = await fetchKanji(p);
+      if (hasKanjiNode(p)) return;
       if (nodes.find((n) => n.id === partId)) return;
       setNodes((nds) => [
         ...nds,
         {
           id: partId,
-          data: { label: `${p}-${data.kanji.main_meanings[0]}`, type: "part" },
+          data: { label: `${p}-${data.kanji?.main_meanings?.[0] ?? "?"}`, type: "part" },
           position: { x: baseX + i * 80, y: baseY + i * 40 },
            className: "part-node",
         },
@@ -99,10 +105,11 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
 
     const kid = `${partId}-rel-${page}-${label}`;
     if (nodes.find((n) => n.id === kid)) return;
-
+    if (hasKanjiNode(label)) return;
     // 🔍 fetch full kanji info
     const kanjiInfo = await fetchKanji(label);
     const name = `${label}-${kanjiInfo.kanji.main_meanings[0]}`
+
     setNodes((nds) => [
       ...nds,
       {

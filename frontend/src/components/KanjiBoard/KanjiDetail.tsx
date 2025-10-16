@@ -1,10 +1,36 @@
 import { useEffect, useState } from "react";
-import { fetchKanji } from "@/api/kanjiApi";
+import { fetchKanji, saveGame } from "@/api/kanjiApi";
 import "./KanjiDetail.css";
 
-export function KanjiDetail({ literal }: { literal: string }) {
+export function KanjiDetail({ literal, currentUser }: { literal: string, currentUser: any }) {
   const [info, setInfo] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+   const handleSave = async () => {
+    if (!currentUser) return alert("You must log in to save kanji.");
+
+    const payload = {
+      user_id: currentUser.id,
+      kanji: {
+        kanji: info.kanji.kanji,
+        meaning: info.kanji.main_meanings?.[0] ?? "",
+        reading: info.kanji.main_readings?.kun?.[0] ?? info.kanji.main_readings?.on?.[0] ?? "",
+        parts: info.kanji.radical?.parts ?? [],
+      },
+    };
+
+    try {
+      const res = await fetch("http://localhost:8000/api/save_kanji", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      alert(res.ok ? "✅ Saved!" : "❌ Save failed.");
+    } catch (e) {
+      console.error("Save error", e);
+      alert("❌ Save error.");
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -36,6 +62,7 @@ export function KanjiDetail({ literal }: { literal: string }) {
      
       {/* Info Section */}
       <div id="kanji-info">
+        <button id = "save_button" onClick={handleSave}>Save Kanji</button>
         <h1>{k.kanji}</h1>
         <p id="strokes">{k.strokes} strokes</p>
 
@@ -54,6 +81,9 @@ export function KanjiDetail({ literal }: { literal: string }) {
         <p>
           Main radical: {k.radical?.basis} ({k.radical?.meaning})
         </p>
+        {k.radical?.alt_forms && (
+          <p>Alternative forms: {k.radical.alt_forms.join(", ")}</p>
+        )}
         {k.radical?.parts && k.radical.parts.length > 0 && (
           <p>Parts: {k.radical.parts.join(", ")}</p>
         )}
