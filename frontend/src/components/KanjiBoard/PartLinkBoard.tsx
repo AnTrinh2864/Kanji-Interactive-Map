@@ -36,8 +36,11 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [showModal, setShowModal] = useState<null | "win" | "lose">(null);
-  const [loading, setLoading] = useState(false);
+  //const [loading, setLoading] = useState(false);
   const [modal, setModal] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [disabled, setDisabled] = useState(true);
+  const [progress, setProgress] = useState(0);
+
   // Save progress to backend
   const handleSave = async () => {
     if (!currentUser || !mainKanji) return alert("You must log in to save progress.");
@@ -70,30 +73,64 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
   };
 
   // Load random main kanji and parts
-  const loadMainKanji = async () => {
-    setLoading(true);
+ const loadMainKanji = async () => {
+   // setLoading(true);
+    setDisabled(true);
+    setProgress(0);
     setCorrectCount(0);
     setIncorrectCount(0);
     setEdges([]);
     setNodes([]);
     setShowModal(null);
 
-    const choice = sample[Math.floor(Math.random() * sample.length)];
-    let choice1 = sample[Math.floor(Math.random() * sample.length)];
-    let choice2 = sample[Math.floor(Math.random() * sample.length)];
-
-    while (choice1 === choice) choice1 = sample[Math.floor(Math.random() * sample.length)];
-    while (choice2 === choice) choice2 = sample[Math.floor(Math.random() * sample.length)];
+    const step = (amount: number) => setProgress((p) => Math.min(p + amount, 100));
 
     try {
-      const kinfo = await fetchKanji(choice);
-      const kinfo1 = await fetchKanji(choice1);
-      const kinfo2 = await fetchKanji(choice2);
+      const choice = sample[Math.floor(Math.random() * sample.length)];
+      let choice1 = sample[Math.floor(Math.random() * sample.length)];
+      let choice2 = sample[Math.floor(Math.random() * sample.length)];
+
+      while (choice1 === choice) choice1 = sample[Math.floor(Math.random() * sample.length)];
+      while (choice2 === choice) choice2 = sample[Math.floor(Math.random() * sample.length)];
+
+      step(10);
+      const [kinfo, kinfo1, kinfo2] = await Promise.all([
+        fetchKanji(choice),
+        fetchKanji(choice1),
+        fetchKanji(choice2),
+      ]);
+      step(20);
 
       const parts1 = kinfo1?.kanji?.radical?.parts ?? [];
       const parts2 = kinfo2?.kanji?.radical?.parts ?? [];
       const kanjiData = kinfo?.kanji || { kanji: choice, meaning: "?" };
       setMainKanji(kanjiData);
+
+      const correctParts = kanjiData.radical?.parts ?? [];
+      setTotalCorrectParts(correctParts.length);
+
+      step(10);
+
+      let parts = [...correctParts, ...parts1, ...parts2].slice(0, 10);
+      if (parts.length < 10) parts = [...parts, "火", "水", "人", "口", "心"];
+      parts = parts.sort(() => 0.5 - Math.random());
+
+      step(15);
+
+      const total = parts.length;
+      const partInfos: any[] = [];
+      for (let i = 0; i < total; i++) {
+        try {
+          const info = await fetchKanji(parts[i]);
+          const meaning = Array.isArray(info.kanji?.main_meanings)
+            ? info.kanji.main_meanings[0]
+            : info.kanji?.main_meaning || "?";
+          partInfos.push({ kanji: parts[i], meaning });
+        } catch {
+          partInfos.push({ kanji: parts[i], meaning: "?" });
+        }
+        step(3); // small progress increment per part
+      }
 
       const mainNode = {
         id: "main",
@@ -102,27 +139,6 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
         className: "kanji-node",
         style: { border: "2px solid green", padding: "8px" },
       };
-
-      const correctParts = kanjiData.radical?.parts ?? [];
-      setTotalCorrectParts(correctParts.length);
-
-      let parts = [...correctParts, ...parts1, ...parts2].slice(0, 10);
-      if (parts.length < 10) parts = [...parts, "火", "水", "人", "口", "心"];
-      parts = parts.sort(() => 0.5 - Math.random());
-
-      const partInfos = await Promise.all(
-        parts.map(async (p) => {
-          try {
-            const info = await fetchKanji(p);
-            const meaning = Array.isArray(info.kanji?.main_meanings)
-              ? info.kanji.main_meanings[0]
-              : info.kanji?.main_meaning || "?";
-            return { kanji: p, meaning };
-          } catch {
-            return { kanji: p, meaning: "?" };
-          }
-        })
-      );
 
       const partNodes = partInfos.map((p, i) => ({
         id: `part-${i}`,
@@ -133,8 +149,14 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
       }));
 
       setNodes([mainNode, ...partNodes]);
+      step(30);
     } finally {
-      setLoading(false);
+      // small delay for smoother completion
+      setTimeout(() => {
+        setProgress(100);
+       // setLoading(false);
+        setDisabled(false);
+      }, 500);
     }
   };
 
@@ -172,22 +194,38 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
 
   return (
     <div id="partlink-board">
+      {disabled && (
+        <div id="disable-overlay">
+          <div className="progress-container">
+            <p>Preparing board...</p>
+            <div className="progress-bar">
+              <div
+                className="progress-fill"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+            <span className="progress-percent">{Math.floor(progress)}%</span>
+          </div>
+        </div>
+      )}
+
+
       {/* Counters + Reset */}
       <div id="board-header">
         <span>✅ Correct: {correctCount}</span>
         <span>❌ Incorrect: {incorrectCount}</span>
       </div>
 
-      {/* Loading overlay */}
+      {/* Loading overlay 
       {loading && (
         <div id="loading-overlay">
           <div id="loading-kanji">漢</div>
           <p id="loading-text">Loading kanji...</p>
         </div>
       )}
-
+      */}
       {/* ReactFlow board */}
-      {!loading && (
+      {(
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -214,6 +252,7 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
       {showModal && (
         <div className="modal-backdrop">
           <div className="modal-content">
+            <button className="close-btn" onClick={() => setShowModal(null)}>×</button>
             <h2>{showModal === "win" ? "🎉 You Win!" : "❌ You Lose!"}</h2>
             <button onClick={loadMainKanji} className="reset-btn">Reset Game</button>
             <button onClick={handleSave} className="save-btn">Save Progress</button>

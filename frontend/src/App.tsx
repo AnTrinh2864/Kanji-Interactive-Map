@@ -71,6 +71,11 @@ function App() {
         </div>
 
         <div id="user-info">
+           <img
+            src="/bunny.svg"
+            alt="User Icon"
+            className="user-icon"
+          />
           <span id="current-user">{currentUser.username}</span>
           <button id="logout-button" onClick={handleLogout}>
             Logout

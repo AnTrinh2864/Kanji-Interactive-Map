@@ -34,3 +34,5 @@ npm run dev
 
 Attribution:
 This project is using data from Jisho, Kanji Alive Api, and Kanjivg svg files.
+svg used:
+https://www.svgrepo.com/svg/280985/easter-bunny-rabbit
