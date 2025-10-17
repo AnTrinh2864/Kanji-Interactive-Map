@@ -4,7 +4,7 @@ import { SearchBar } from "./components/KanjiBoard/SearchBar";
 import { KanjiBoard } from "./components/KanjiBoard/KanjiBoard";
 import { KanjiDetail } from "./components/KanjiBoard/KanjiDetail";
 import { PartLinkBoard } from "./components/KanjiBoard/PartLinkBoard";
-import { SavedKanjisTab } from "./components/KanjiBoard/savedKanji";
+import { SavedKanjisTab } from "./components/KanjiBoard/SavedKanjiList";
 import { AuthForm } from "./components/KanjiBoard/AuthForm";
 import { fetchSavedKanjis } from "./api/kanjiApi";
 import "./App.css";

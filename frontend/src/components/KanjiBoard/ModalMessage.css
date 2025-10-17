@@ -1,0 +1,72 @@
+.modal-message {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  padding: 1rem 1.25rem;
+  min-width: 240px;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border: 6px solid transparent;
+  z-index: 150;
+
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeSlideIn 0.35s ease-out forwards, fadeOut 0.4s ease-in 1.8s forwards;
+
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Success and error styles */
+.modal-message.success {
+  border-color: #3eb66a; /* green-600 */
+  box-shadow: 0 4px 20px rgba(61, 165, 99, 0.721);
+}
+
+.modal-message.error {
+  border-color: #c24545; /* red-600 */
+  box-shadow: 0 4px 20px rgba(175, 33, 33, 0.678);
+}
+
+/* Optional subtle icons (can replace with SVGs if you like) */
+.modal-message.success::before {
+  content: "✔";
+  color: #16a34a;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.modal-message.error::before {
+  content: "✖";
+  color: #dc2626;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Animations */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}

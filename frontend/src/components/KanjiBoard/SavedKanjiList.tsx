@@ -4,12 +4,13 @@ import {
   deleteSavedKanji,
   type SavedKanji,
 } from "@/api/kanjiApi";
-import './savedKanji.css'
+import './SavedKanjiList.css';
 interface SavedKanjisTabProps {
   currentUser: any;
   onSelectKanji: (kanji: any) => void;
   setActiveTab: (tab: "explorer" | "details" | "partlink" | "saved") => void;
 }
+import { ModalMessage } from "./ModalMessage";
 
 export function SavedKanjisTab({
   currentUser,
@@ -19,7 +20,7 @@ export function SavedKanjisTab({
   const [savedKanjis, setSavedKanjis] = useState<SavedKanji[]>([]);
   const [loadingSaved, setLoadingSaved] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
-
+  const [modal, setModal] = useState<{ message: string; type: "success" | "error" } | null>(null);
   useEffect(() => {
     if (currentUser) loadSavedKanjis();
   }, [currentUser]);
@@ -37,16 +38,13 @@ export function SavedKanjisTab({
 
   const handleDelete = async (kanjiId: number) => {
     if (!currentUser?.id) return;
-    const confirmDelete = confirm("Remove this kanji from your saved list?");
-    if (!confirmDelete) return;
-
     setDeletingId(kanjiId);
     try {
       await deleteSavedKanji(currentUser.id, kanjiId);
-      // Update UI immediately without reloading all
       setSavedKanjis((prev) => prev.filter((k) => k.id !== kanjiId));
+      setModal({ message: "Kanji removed successfully", type: "success" });
     } catch (err) {
-      alert("❌ Failed to delete kanji");
+      setModal({ message: "Failed to delete kanji", type: "error" });
     } finally {
       setDeletingId(null);
     }
@@ -100,6 +98,14 @@ export function SavedKanjisTab({
             </div>
           ))}
         </div>
+      )}
+       {/* Modal message */}
+      {modal && (
+        <ModalMessage
+          message={modal.message}
+          type={modal.type}
+          onClose={() => setModal(null)}
+        />
       )}
     </div>
   );

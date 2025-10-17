@@ -13,6 +13,7 @@ import "reactflow/dist/style.css";
 import { fetchKanji } from "@/api/kanjiApi";
 import "./PartLinkBoard.css"; // modal + board styles
 import sample from "./sample";
+import { ModalMessage } from "./ModalMessage";
 
 type KanjiData = {
   kanji: string;
@@ -36,7 +37,7 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [showModal, setShowModal] = useState<null | "win" | "lose">(null);
   const [loading, setLoading] = useState(false);
-
+  const [modal, setModal] = useState<{ message: string; type: "success" | "error" } | null>(null);
   // Save progress to backend
   const handleSave = async () => {
     if (!currentUser || !mainKanji) return alert("You must log in to save progress.");
@@ -57,10 +58,14 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      alert(res.ok ? "✅ Saved!" : "❌ Save failed.");
+      if (res.ok) {
+        setModal({ message: "Kanji saved successfully", type: "success" });
+      } else {
+        setModal({ message: "Kanji was not saved successfully", type: "error" });
+      }
     } catch (e) {
       console.error("Save error", e);
-      alert("❌ Save error.");
+      setModal({ message: "Kanji was not saved successfully", type: "error" });
     }
   };
 
@@ -215,6 +220,14 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
           </div>
         </div>
       )}
+       {/* Modal message */}
+            {modal && (
+              <ModalMessage
+                message={modal.message}
+                type={modal.type}
+                onClose={() => setModal(null)}
+              />
+            )}
     </div>
   );
 }

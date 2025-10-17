@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchKanji, saveGame } from "@/api/kanjiApi";
+import { ModalMessage } from "./ModalMessage";
 import "./KanjiDetail.css";
 
 export function KanjiDetail({ literal, currentUser }: { literal: string, currentUser: any }) {
   const [info, setInfo] = useState<any | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [modal, setModal] = useState<{ message: string; type: "success" | "error" } | null>(null);
    const handleSave = async () => {
     if (!currentUser) return alert("You must log in to save kanji.");
 
@@ -25,10 +26,14 @@ export function KanjiDetail({ literal, currentUser }: { literal: string, current
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      alert(res.ok ? "✅ Saved!" : "❌ Save failed.");
+      if (res.ok) {
+        setModal({ message: "Kanji added successfully", type: "success" });
+      } else {
+        setModal({ message: "Kanji was not saved successfully", type: "error" });
+      }
     } catch (e) {
       console.error("Save error", e);
-      alert("❌ Save error.");
+      setModal({ message: "Kanji was not saved successfully", type: "error" });
     }
   };
 
@@ -114,7 +119,14 @@ export function KanjiDetail({ literal, currentUser }: { literal: string, current
           </div>
         </div>
       </div>
-
+       {/* Modal message */}
+      {modal && (
+        <ModalMessage
+          message={modal.message}
+          type={modal.type}
+          onClose={() => setModal(null)}
+        />
+      )}
       {/* Modal for enlarged stroke order */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
