@@ -1,5 +1,5 @@
 // src/components/KanjiBoard.tsx
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -23,9 +23,32 @@ type KanjiData = {
   strokes?: number;
 };
 
-export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiData | null, loading:boolean }) {
+export function KanjiBoard({ setSelectedKanji, selectedKanji, loading }: { 
+  setSelectedKanji: React.Dispatch<React.SetStateAction<string>>, 
+  selectedKanji: KanjiData | null, loading:boolean }) {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [tooltip, setTooltip] = useState<{ x: number; y: number; content: string } | null>(null);
+
+  const handleNodeMouseEnter = (_: React.MouseEvent, node: Node) => {
+    const { readings } = node.data;
+    const readingText =
+      readings?.join?.(", ") || null ;
+    const readingOn = readings?.on?.join(", ") || null
+    const readingKun = readings?.kun?.join(", ") || null
+    const content = `
+      <strong>${node.data.label}</strong><br/>
+     ${readingText ? `<span>Readings: ${readingText}</span><br/>` : ""}
+     ${readingOn ? `<span>On Readings: ${readingOn}</span><br/>` : ""}
+     ${readingKun ? `<span>Kun Readings: ${readingKun}</span><br/>` : ""}
+    `;
+
+    setTooltip({ x: _.clientX + 10, y: _.clientY + 10, content });
+  };
+
+  const handleNodeMouseLeave = () => {
+    setTooltip(null);
+  };
 
   // Animated entry
   const springs = useSpring({ opacity: 1, from: { opacity: 0 } });
@@ -47,6 +70,7 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
         id,
         data: {
           label: `${id}-${kanji.meaning}`,
+          kanji: `${id}`,
           meaning: kanji.meaning,
           meanings: kanji.meanings,
           radical: kanji.radical,
@@ -59,6 +83,22 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
     ]);
   };
 
+  const handleListResult = (p: string, kanji_list: any[]) => {
+    if (kanji_list) {
+        for (let i = 0; i < kanji_list.length; i ++) {
+          if (p === kanji_list[i].kanji) {
+              const kanji = kanji_list[i]
+              const result = {
+                kanji: kanji.kanji,
+                readings: kanji.main_readings,
+                meanings: kanji.main_meanings,
+              }
+              return result;
+          }
+        }
+      }
+      return
+  }
   // whenever selectedKanji changes, add it
   useEffect(() => {
     if (selectedKanji) {
@@ -73,16 +113,22 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
 
     parts.forEach(async (p, i) => {
       const partId = `${p}`;
+      console.log(p)
       const data = await fetchKanji(p);
       if (hasKanjiNode(p)) return;
       if (nodes.find((n) => n.id === partId)) return;
+      const result = handleListResult(p, data.kanji_list)
       setNodes((nds) => [
         ...nds,
         {
           id: partId,
-          data: { label: `${p}-${data.kanji?.main_meanings?.[0] ?? "?"}`, type: "part" },
+          data: { label: `${p}-${data.kanji?.main_meanings?.[0] ?? "?"}`,
+             type: "part",
+             kanji: `${p}`,
+             meanings: result?.meanings ?? data.kanji?.main_meanings ?? "?",
+             readings: result?.readings ?? data.kanji?.main_readings ?? "?"},
           position: { x: baseX + i * 80, y: baseY + i * 40 },
-           className: "part-node",
+          className: "part-node",
         },
       ]);
 
@@ -109,7 +155,7 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
     // 🔍 fetch full kanji info
     const kanjiInfo = await fetchKanji(label);
     const name = `${label}-${kanjiInfo.kanji.main_meanings[0]}`
-
+    console.log(kanjiInfo.kanji.readings)
     setNodes((nds) => [
       ...nds,
       {
@@ -120,8 +166,8 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
           kanji: label,
           radical: kanjiInfo?.kanji.radical,
           meaning: kanjiInfo?.kanji.meaning,
-          meanings: kanjiInfo?.kanji.meanings,
-          readings: kanjiInfo?.kanji.readings,
+          meanings: kanjiInfo?.kanji.main_meanings,
+          readings: kanjiInfo?.kanji.main_readings,
         },
         position: { x: baseX + i * 50, y: baseY + i * 50 },
         className: "kanji-node",
@@ -145,6 +191,7 @@ export function KanjiBoard({ selectedKanji, loading }: { selectedKanji: KanjiDat
 
 
  const handleNodeClick = (node: Node) => {
+  setSelectedKanji(node.data)
   if (node.data.type === "kanji") {
     console.log("type: " + node.data.type)
     console.log("label: " + node.data.label)
@@ -264,6 +311,8 @@ const handleOrganize = () => {
       onEdgesChange={onEdgesChange}
       onNodeClick={(_, node) => handleNodeClick(node)}
       onNodeContextMenu={handleNodeContextMenu}
+      onNodeMouseEnter={handleNodeMouseEnter}
+      onNodeMouseLeave={handleNodeMouseLeave}
       fitView
       >
         <MiniMap 
@@ -281,6 +330,27 @@ const handleOrganize = () => {
         <Controls />
         <Background variant={BackgroundVariant.Dots} gap={16} size={1} />
       </ReactFlow>
+      {tooltip && (
+      <div
+        className="kanji-tooltip"
+        style={{
+          position: "fixed",
+          top: tooltip.y,
+          left: tooltip.x,
+          background: "rgba(30, 41, 59, 0.9)",
+          color: "white",
+          padding: "8px 12px",
+          borderRadius: "8px",
+          fontSize: "0.9rem",
+          pointerEvents: "none",
+          zIndex: 1000,
+          maxWidth: "200px",
+          lineHeight: "1.3",
+        }}
+        dangerouslySetInnerHTML={{ __html: tooltip.content }}
+      />
+    )}
+
     </animated.div>
     </div>
   );

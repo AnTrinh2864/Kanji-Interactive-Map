@@ -95,7 +95,7 @@ function App() {
               />
             </div>
             <div id="kanji-board-container">
-              <KanjiBoard selectedKanji={selectedKanji} loading={loading} />
+              <KanjiBoard setSelectedKanji = {setSelectedKanji} selectedKanji={selectedKanji} loading={loading} />
             </div>
           </div>
         )}

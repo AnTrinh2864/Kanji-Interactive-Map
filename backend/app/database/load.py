@@ -2,8 +2,8 @@ from rich.progress import Progress, BarColumn, TextColumn, TimeRemainingColumn, 
 import time
 
 # total duration (2 hours = 7200 seconds)
-total_time = 3 * 60 * 60
-steps = 1000  # smoothness of the bar
+total_time = 4 * 60 * 60
+steps = 10000  # smoothness of the bar
 sleep_time = total_time / steps
 
 # Set up a fancy progress bar
@@ -20,4 +20,4 @@ with Progress(
         progress.update(task, advance=1)
         time.sleep(sleep_time)
 
-print("\n🎉 [bold green]All done![/bold green] The process has completed successfully.")
+print("🎉 [bold green]All done![/bold green] The process has completed successfully.")
