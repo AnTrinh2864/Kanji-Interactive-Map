@@ -139,7 +139,7 @@ export function KanjiBoard({ setSelectedKanji, selectedKanji, loading }: {
     });
   };
 
- const addRelated = (partId: string, kanjis: (KanjiData | string)[], page: number, meaning: string) => {
+ const addRelated = (partId: string, kanjis: (KanjiData | string)[], page: number) => {
   const baseX = Math.random() * 400;
   const baseY = Math.random() * 400;
 
@@ -204,8 +204,7 @@ export function KanjiBoard({ setSelectedKanji, selectedKanji, loading }: {
       const pageSize = 9;
       const page = 0;
       const nextBatch = (data?.kanji_list ?? []).slice(page * pageSize, (page + 1) * pageSize);
-      const meaning = data?.meaning ?? ""
-      addRelated(node.id, nextBatch, page,meaning );
+      addRelated(node.id, nextBatch, page );
     });
   } else if (node.data.type === "more") {
     console.log("type: " + node.data.type)
@@ -218,8 +217,7 @@ export function KanjiBoard({ setSelectedKanji, selectedKanji, loading }: {
     fetchRelated(partId).then((data) => {
       const pageSize = 9;
       const nextBatch = (data?.kanji_list ?? []).slice(page * pageSize, (page + 1) * pageSize);
-      const meaning = data?.meaning ?? ""
-      addRelated(partId, nextBatch, page, meaning);
+      addRelated(partId, nextBatch, page);
     });
   }
 };
