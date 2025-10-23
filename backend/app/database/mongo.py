@@ -41,22 +41,18 @@ def fetch_kanji(char, retries=3, delay=2):
                 print(f"❌ Skipping {char} after {retries} retries.")
                 return None
 
-# Collect already-processed kanji from DB to resume progress
 processed_kanji = set()
 for doc in radicals_collection.find({}, {"kanjis": 1}):
     for k in doc.get("kanjis", []):
-        # Use the field that actually contains the kanji character
-        char_field = k.get("kanji") or k.get("character")  # fallback
+        char_field = k.get("kanji") or k.get("character")
         if char_field:
             processed_kanji.add(char_field)
 
-
 print(f"✅ Resuming... {len(processed_kanji)} kanji already processed.")
 
-# Main loop with checkpoint saving
 for char in tqdm(kanji_list, desc="Processing kanji"):
     if char in processed_kanji:
-        continue  # skip already processed
+        continue 
 
     k_info = fetch_kanji(char)
     if not k_info or not k_info.data:
@@ -66,7 +62,6 @@ for char in tqdm(kanji_list, desc="Processing kanji"):
     if not parts:
         continue
 
-    # Save immediately to MongoDB as checkpoint
     for part in parts:
         radicals_collection.update_one(
             {"radical": part},
@@ -74,10 +69,8 @@ for char in tqdm(kanji_list, desc="Processing kanji"):
             upsert=True
         )
 
-    # Mark as processed
     processed_kanji.add(char)
 
-    # Small delay to avoid hammering Jisho
     time.sleep(0.3)
 
 print("🎉 All kanji processed and stored in MongoDB!")

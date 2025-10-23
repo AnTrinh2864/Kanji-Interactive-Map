@@ -11,7 +11,7 @@ export function AuthForm({ onAuthSuccess }: AuthFormProps) {
   const [passwordError, setPasswordError] = useState("");
 
   const validatePassword = (password: string) => {
-    if (authMode === "login") return ""; // Skip validation for login
+    if (authMode === "login") return "";
 
     if (password.length < 8)
       return "Password must be at least 8 characters long.";

@@ -50,8 +50,6 @@ export function KanjiDetail({ literal, currentUser }: { literal: string, current
 
   return (
     <div id="kanji-detail">
-     
-      {/* Info Section */}
       <div id="kanji-info">
         <button id = "save_button" onClick={handleSave}>Save Kanji</button>
         <h1>{k.kanji}</h1>
@@ -105,7 +103,6 @@ export function KanjiDetail({ literal, currentUser }: { literal: string, current
           </div>
         </div>
       </div>
-       {/* Modal message */}
       {modal && (
         <ModalMessage
           message={modal.message}
@@ -113,7 +110,6 @@ export function KanjiDetail({ literal, currentUser }: { literal: string, current
           onClose={() => setModal(null)}
         />
       )}
-      {/* Modal for enlarged stroke order */}
       {isModalOpen && (
         <div className="modal-overlay" onClick={() => setIsModalOpen(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>

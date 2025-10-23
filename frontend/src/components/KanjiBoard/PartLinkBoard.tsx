@@ -4,7 +4,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { fetchKanji } from "@/api/kanjiApi";
-import "./PartLinkBoard.css"; // modal + board styles
+import "./PartLinkBoard.css"; 
 import sample from "./sample";
 import { ModalMessage } from "./ModalMessage";
 import { ProgressBar } from "./ProgressBar";

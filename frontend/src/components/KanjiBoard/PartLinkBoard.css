@@ -143,8 +143,8 @@
   margin-bottom: 8px;
 }
 .progress-fill {
-  height: 100%; /* Make it fill the height of the parent bar */
-  width: 0%; /* Start at 0% width */
+  height: 100%; 
+  width: 0%; 
   background: linear-gradient(90deg, #10b981, #3b82f6, #10b981);
   background-size: 200% 100%;
   animation: shimmer 1.2s linear infinite;

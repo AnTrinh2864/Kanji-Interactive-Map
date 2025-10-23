@@ -8,9 +8,6 @@ import type { Node,Edge } from "reactflow";
     setNodes((nds) => nds.filter((n) => n.id !== node.id));
     setEdges((eds) => eds.filter((e) => e.source !== node.id && e.target !== node.id));
   };
-
-  // inside KanjiBoard component
-
   export const handleReset = (
     setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
     setEdges: React.Dispatch<React.SetStateAction<Edge[]>>

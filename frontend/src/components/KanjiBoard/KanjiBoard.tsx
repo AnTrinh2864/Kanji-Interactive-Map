@@ -33,11 +33,7 @@ export function KanjiBoard({ setSelectedKanji, selectedKanji, loading }: {
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [tooltip, setTooltip] = useState<{ x: number; y: number; content: string } | null>(null);
 
-  // Animated entry
   const springs = useSpring({ opacity: 1, from: { opacity: 0 } });
-  
- 
-  // whenever selectedKanji changes, add it
   useEffect(() => {
     if (selectedKanji) {
       addKanji(selectedKanji, nodes, setNodes);
