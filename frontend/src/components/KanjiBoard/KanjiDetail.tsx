@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { fetchKanji, saveGame } from "@/api/kanjiApi";
+import { fetchKanji } from "@/api/kanjiApi";
 import { ModalMessage } from "./ModalMessage";
 import "./KanjiDetail.css";
 

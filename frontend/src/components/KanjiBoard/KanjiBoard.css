@@ -79,6 +79,26 @@
   padding: 6px;
   text-align: center;
 }
+/* Selected Node — Glowing Orange Effect */
+.selected-node {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 15px 5px rgba(245, 158, 11, 0.6);
+  animation: glowOrange 2s infinite;
+}
+
+/* Glow animation */
+@keyframes glowOrange {
+  0% {
+    box-shadow: 0 0 10px 3px rgba(245, 158, 11, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 10px 3px rgba(245, 158, 11, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 10px 3px rgba(245, 158, 11, 0.3);
+  }
+}
+
 
 .kanji-minimap {
   position: fixed;

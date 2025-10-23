@@ -33,10 +33,6 @@ export function SearchBar({ onSelect, loading, setLoading }: {
     setQuery(value);
   };
 
-  useEffect(() => {
-    console.log("suggestions updated:", suggestions);
-  }, [suggestions]);
-
   return (
     <div>
     {loading ? (

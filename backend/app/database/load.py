@@ -2,7 +2,7 @@ from rich.progress import Progress, BarColumn, TextColumn, TimeRemainingColumn, 
 import time
 
 # total duration (2 hours = 7200 seconds)
-total_time = 2 * 60 * 60
+total_time = 3 * 60 * 60
 steps = 10000  # smoothness of the bar
 sleep_time = total_time / steps
 
