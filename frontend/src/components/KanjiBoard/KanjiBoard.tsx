@@ -12,10 +12,10 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import { useSpring, animated } from "@react-spring/web";
 import "./KanjiBoard.css";
-import { fetchKanji, fetchRelated } from "@/api/kanjiApi";
+import { fetchRelated } from "@/api/kanjiApi";
 import { Tooltip } from "./hooks/ToolTip";
 import { handleNodeMouseEnter, handleNodeMouseLeave } from "./utils/MouseHandler";
-import { addKanji, hasKanjiNode, addParts, addRelated } from "./utils/KanjiHandler";
+import { addKanji, addParts, addRelated } from "./utils/KanjiHandler";
 import { handleNodeContextMenu, handleOrganize, handleReset } from "./utils/DegreeHandler";
 type KanjiData = {
   kanji: string;

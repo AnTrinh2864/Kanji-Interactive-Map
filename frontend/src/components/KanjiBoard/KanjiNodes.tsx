@@ -1,5 +1,4 @@
 
-import React from "react";
 
 export const KanjiNode = ({ data }: { data: any }) => {
   const mainMeaning = data.meanings?.[0] || data.meaning || "";
@@ -35,7 +34,7 @@ export const PartNode = ({ data }: { data: any }) => {
   );
 };
 
-export const MoreNode = ({ data }: { data: any }) => {
+export const MoreNode = () => {
   return (
     <div style={{
       padding: "6px",

@@ -1,31 +1,15 @@
 import { useState, useEffect, useCallback } from "react";
 import ReactFlow, {
-  Background,
-  Controls,
-  addEdge,
-  useNodesState,
-  useEdgesState,
-  type Connection,
-  MiniMap,
-  BackgroundVariant,
+  Background, Controls, addEdge, useNodesState, useEdgesState, type Connection, MiniMap, BackgroundVariant,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import { fetchKanji } from "@/api/kanjiApi";
 import "./PartLinkBoard.css"; // modal + board styles
 import sample from "./sample";
 import { ModalMessage } from "./ModalMessage";
-
-type KanjiData = {
-  kanji: string;
-  meaning?: string;
-  meanings?: string[];
-  radical?: { parts?: string[] };
-  main_meanings?: string[];
-  main_readings?: {
-    kun?: string[];
-    on?: string[];
-  };
-};
+import { ProgressBar } from "./ProgressBar";
+import { saveKanji } from "./utils/KanjiHandler";
+import { type KanjiData } from "./utils/KanjiHandler";
 
 export function PartLinkBoard({ currentUser }: { currentUser: any }) {
   const [correctCount, setCorrectCount] = useState(0);
@@ -54,24 +38,8 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
         parts: mainKanji.radical?.parts ?? [],
       },
     };
-
-    try {
-      const res = await fetch("http://localhost:8000/api/save_kanji", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (res.ok) {
-        setModal({ message: "Kanji saved successfully", type: "success" });
-      } else {
-        setModal({ message: "Kanji was not saved successfully", type: "error" });
-      }
-    } catch (e) {
-      console.error("Save error", e);
-      setModal({ message: "Kanji was not saved successfully", type: "error" });
-    }
-  };
-
+    saveKanji(payload, setModal)
+  }
   // Load random main kanji and parts
  const loadMainKanji = async () => {
    // setLoading(true);
@@ -195,35 +163,13 @@ export function PartLinkBoard({ currentUser }: { currentUser: any }) {
   return (
     <div id="partlink-board">
       {disabled && (
-        <div id="disable-overlay">
-          <div className="progress-container">
-            <p>Preparing board...</p>
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-            <span className="progress-percent">{Math.floor(progress)}%</span>
-          </div>
-        </div>
+        <ProgressBar progress={progress}/>
       )}
-
-
       {/* Counters + Reset */}
       <div id="board-header">
         <span>✅ Correct: {correctCount}</span>
         <span>❌ Incorrect: {incorrectCount}</span>
       </div>
-
-      {/* Loading overlay 
-      {loading && (
-        <div id="loading-overlay">
-          <div id="loading-kanji">漢</div>
-          <p id="loading-text">Loading kanji...</p>
-        </div>
-      )}
-      */}
       {/* ReactFlow board */}
       {(
         <ReactFlow

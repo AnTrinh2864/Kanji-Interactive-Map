@@ -1,7 +1,8 @@
 import { fetchKanji } from "@/api/kanjiApi";
 import type React from "react";
 import {type Edge, type Node} from "reactflow"
-type KanjiData = {
+
+export type KanjiData = {
   kanji: string;
   meaning?: string;
   meanings?: string[];
@@ -10,6 +11,11 @@ type KanjiData = {
   radical?: { parts?: string[] };
   strokes?: number;
   parts?: string[];
+  main_meanings?: string[];
+  main_readings?: {
+    kun?: string[];
+    on?: string[];
+  };
 };
 
 export const hasKanjiNode = (kanjiChar: string, nodes: Node[]) =>
@@ -145,3 +151,23 @@ export const addRelated = (partId: string, kanjis: (KanjiData | string)[], page:
   ]);
   setEdges((eds) => [...eds, { id: `${partId}->${partId}-more-${page+1}`, source: partId, target: `${partId}-more-${page+1}` }]);
 };
+export const saveKanji = async (
+  payload: {},
+  setModal: React.Dispatch<React.SetStateAction<{ message: string; type: "success" | "error" } | null>>
+) => {
+   try {
+      const res = await fetch("http://localhost:8000/api/save_kanji", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        setModal({ message: "Kanji saved successfully", type: "success" });
+      } else {
+        setModal({ message: "Kanji was not saved successfully", type: "error" });
+      }
+    } catch (e) {
+      console.error("Save error", e);
+      setModal({ message: "Kanji was not saved successfully", type: "error" });
+    }
+  }

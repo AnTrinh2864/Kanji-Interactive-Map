@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { fetchKanji } from "@/api/kanjiApi";
 import { ModalMessage } from "./ModalMessage";
 import "./KanjiDetail.css";
+import { saveKanji } from "./utils/KanjiHandler";
 
 export function KanjiDetail({ literal, currentUser }: { literal: string, currentUser: any }) {
   const [info, setInfo] = useState<any | null>(null);
@@ -19,22 +20,7 @@ export function KanjiDetail({ literal, currentUser }: { literal: string, current
         parts: info.kanji.radical?.parts ?? [],
       },
     };
-
-    try {
-      const res = await fetch("http://localhost:8000/api/save_kanji", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-      if (res.ok) {
-        setModal({ message: "Kanji added successfully", type: "success" });
-      } else {
-        setModal({ message: "Kanji was not saved successfully", type: "error" });
-      }
-    } catch (e) {
-      console.error("Save error", e);
-      setModal({ message: "Kanji was not saved successfully", type: "error" });
-    }
+    saveKanji(payload, setModal)
   };
 
   useEffect(() => {
