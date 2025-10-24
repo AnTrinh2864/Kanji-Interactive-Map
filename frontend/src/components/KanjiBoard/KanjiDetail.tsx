@@ -68,7 +68,7 @@ export function KanjiDetail({ literal, currentUser }: { literal: string, current
 
         <h2>Radical</h2>
         <p>
-          Main radical: {k.radical?.basis} ({k.radical?.meaning})
+          Main radical: {k.radical?.basis} - {k.radical?.meaning}
         </p>
         {k.radical?.alt_forms && (
           <p>Alternative forms: {k.radical.alt_forms.join(", ")}</p>
