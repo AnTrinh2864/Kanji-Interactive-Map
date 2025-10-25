@@ -4,7 +4,7 @@
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-start;
-  max-width: 1200px;
+  width: 1200px;
   margin: 2rem auto;
   padding: 2rem;
   font-family: "Segoe UI", Arial, sans-serif;
@@ -41,6 +41,8 @@
 #kanji-info {
   flex: 1;
   max-width: 800px;
+  text-align: left;
+
 }
 
 #kanji-info h1 {
@@ -53,6 +55,19 @@
   font-size: 1rem;
   margin-bottom: 1rem;
   color: #666;
+}
+
+#stroke {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: 300px;
+  height: 360px; /* slightly taller to include the title */
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  box-sizing: border-box;
 }
 
 #kanji-info h2 {

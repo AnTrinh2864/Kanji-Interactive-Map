@@ -48,7 +48,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;   /* make sure it's above the board */
+  z-index: 190;   /* make sure it's above the board */
 }
 
 .modal-content {
@@ -59,7 +59,7 @@
   max-height: 70vh;
   overflow-y: auto;
   box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-  z-index: 1001;   /* content above overlay */
+  z-index: 200;   /* content above overlay */
 }
 
 

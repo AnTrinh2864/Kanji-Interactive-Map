@@ -69,3 +69,13 @@ export async function deleteSavedKanji(userId: number, kanjiId: number) {
     throw err;
   }
 }
+
+export async function fetchMulQuiz() {
+  try {
+    const response = await axios.get(`${API_BASE}/mulquiz`);
+    return response.data; // array of 4 random kanji
+  } catch (error: any) {
+    console.error("Error fetching multiple choice quiz:", error.message);
+    return [];
+  }
+}
