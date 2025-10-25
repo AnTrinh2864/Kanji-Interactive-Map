@@ -1,10 +1,18 @@
 /* Root container */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #f5f5f5; /* optional - or whatever your app background should be */
+}
+
 #app-root {
-  max-width: 1240px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  height: 96vh;
+  height: 100%;
 }
 
 /* Auth container */
@@ -69,10 +77,10 @@
   background-color: #3d613c;
   display: flex;
   align-items: center;
-  padding: 0 1rem;
   position: sticky;
   top: 0;
-  z-index: 50;
+  z-index: 3000;
+  width: 100%;
 }
 
 #navbar .tab {
@@ -116,6 +124,7 @@
   color: rgb(0, 0, 0);
   font-size: 0.9rem;
   padding: 0.4rem 0.9rem;
+  margin-right: 10px;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
@@ -208,4 +217,70 @@
   to {
     transform: rotate(360deg);
   }
+}
+/* --- Dropdown Menu (Navbar-integrated hover style) --- */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* "Quiz" button style — matches other .tab buttons */
+.dropdown > .tab {
+  background: transparent;
+  border: none;
+  color: #f1edde;
+  font-size: 1rem;
+  padding: 0.75rem 1.25rem;
+  cursor: default; /* not clickable, only hover */
+  border-bottom: 3px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.dropdown > .tab:hover {
+  color: #ffffff;
+}
+
+/* Dropdown container */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: #2e4d2c; /* dark green consistent with navbar */
+  border-radius: 0.5rem;
+  min-width: 180px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  z-index: 2500;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
+}
+
+/* React will mount/unmount it, but we can still add a fade-in animation */
+.dropdown:hover .dropdown-menu,
+.dropdown-menu.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events:auto;
+}
+
+/* Dropdown buttons */
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  border: none;
+  color: #f1edde;
+  text-align: left;
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease, color 0.2s ease, padding-left 0.2s ease;
+}
+
+.dropdown-menu button:hover {
+  background-color: #f1edde;
+  color: #2e4d2c;
+  padding-left: 1.4rem;
+  cursor: pointer;
 }

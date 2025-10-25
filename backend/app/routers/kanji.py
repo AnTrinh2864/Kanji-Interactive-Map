@@ -57,3 +57,23 @@ async def get_kanji_by_part(part: str):
         return {"part": part, "kanji_list": doc["kanji_list"], "meaning": doc["meaning"]}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+@router.get("/api/mulquiz")
+async def get_multiple_choice_quiz():
+    try:
+        # Access the KanjiList collection
+        kanji_collection = db["KanjiList"]
+
+        # Use MongoDB's $sample to fetch 4 random documents
+        random_docs = list(kanji_collection.aggregate([{"$sample": {"size": 4}}]))
+
+        if not random_docs:
+            raise HTTPException(status_code=404, detail="No kanji found in the collection")
+
+        # Convert ObjectId to string for JSON serialization
+        for doc in random_docs:
+            doc["_id"] = str(doc["_id"])
+
+        return {"quiz_items": random_docs}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

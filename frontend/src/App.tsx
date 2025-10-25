@@ -3,19 +3,19 @@ import { useEffect, useState } from "react";
 import { SearchBar } from "./components/KanjiBoard/SearchBar";
 import { KanjiBoard } from "./components/KanjiBoard/KanjiBoard";
 import { KanjiDetail } from "./components/KanjiBoard/KanjiDetail";
-import { PartLinkBoard } from "./components/KanjiBoard/PartLinkBoard";
 import { SavedKanjisTab } from "./components/KanjiBoard/SavedKanjiList";
 import { AuthForm } from "./components/KanjiBoard/AuthForm";
 import { fetchSavedKanjis } from "./api/kanjiApi";
 import "./App.css";
+import QuizSection from "./components/KanjiBoard/quiz/QuizSection";
 
 function App() {
   const [selectedKanji, setSelectedKanji] = useState<any>(null);
   const [activeTab, setActiveTab] = useState<
-    "explorer" | "details" | "partlink" | "saved"
+    "explorer" | "details" | "saved" | "quiz-partlink" | "quiz-mc" | "quiz-fill"
   >("explorer");
   const [loading, setLoading] = useState(false);
-
+  const [showQuizMenu, setShowQuizMenu] = useState(false);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   // Load saved kanjis when user logs in
@@ -57,17 +57,32 @@ function App() {
             Kanji Details
           </button>
           <button
-            className={activeTab === "partlink" ? "tab active" : "tab"}
-            onClick={() => setActiveTab("partlink")}
-          >
-            Part Link
-          </button>
-          <button
             className={activeTab === "saved" ? "tab active" : "tab"}
             onClick={() => setActiveTab("saved")}
           >
             Saved Kanjis
           </button>
+          {/* Quiz Dropdown */}
+          <div
+            className="dropdown"
+            onMouseEnter={() => setShowQuizMenu(true)}
+            onMouseLeave={() => setShowQuizMenu(false)}
+          >
+            <button className = {activeTab.includes("quiz") ? "tab active" : "tab"}>Quiz ▾</button>
+            {showQuizMenu && (
+              <div className="dropdown-menu">
+                <button onClick={() => setActiveTab("quiz-partlink")}>
+                  Part Link
+                </button>
+                <button onClick={() => setActiveTab("quiz-mc")}>
+                  Multiple Choice
+                </button>
+                <button onClick={() => setActiveTab("quiz-fill")}>
+                  Fill in the Blank
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         <div id="user-info">
@@ -122,18 +137,23 @@ function App() {
           </div>
         )}
 
-        {activeTab === "partlink" && (
-          <div id="partlink-tab">
-            <PartLinkBoard currentUser={currentUser} />
-          </div>
-        )}
-
         {activeTab === "saved" && (
           <SavedKanjisTab
             currentUser={currentUser}
             onSelectKanji={setSelectedKanji}
             setActiveTab={setActiveTab}
           />
+        )}
+
+         {/* Quiz Sections */}
+        {activeTab === "quiz-partlink" && (
+          <QuizSection currentUser={currentUser} defaultQuiz="Part Link" />
+        )}
+        {activeTab === "quiz-mc" && (
+          <QuizSection currentUser={currentUser} defaultQuiz="Multiple Choice" />
+        )}
+        {activeTab === "quiz-fill" && (
+          <QuizSection currentUser={currentUser} defaultQuiz="Fill in the blank" />
         )}
       </div>
     </div>

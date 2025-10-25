@@ -6,10 +6,10 @@ import "reactflow/dist/style.css";
 import { fetchKanji } from "@/api/kanjiApi";
 import "./PartLinkBoard.css"; 
 import sample from "./sample";
-import { ModalMessage } from "./ModalMessage";
+import { ModalMessage } from "../ModalMessage";
 import { ProgressBar } from "./ProgressBar";
-import { saveKanji } from "./utils/KanjiHandler";
-import { type KanjiData } from "./utils/KanjiHandler";
+import { saveKanji } from "../utils/KanjiHandler";
+import { type KanjiData } from "../utils/KanjiHandler";
 
 export function PartLinkBoard({ currentUser }: { currentUser: any }) {
   const [correctCount, setCorrectCount] = useState(0);

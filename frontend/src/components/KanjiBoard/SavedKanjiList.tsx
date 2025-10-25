@@ -8,7 +8,7 @@ import './SavedKanjiList.css';
 interface SavedKanjisTabProps {
   currentUser: any;
   onSelectKanji: (kanji: any) => void;
-  setActiveTab: (tab: "explorer" | "details" | "partlink" | "saved") => void;
+  setActiveTab: (tab: "explorer" | "details" | "saved") => void;
 }
 import { ModalMessage } from "./ModalMessage";
 
