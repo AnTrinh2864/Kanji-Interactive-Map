@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import "./MultipleChoice.css"
-import { fetchMulQuiz } from "@/api/kanjiApi";
+import { fetchKanji, fetchMulQuiz } from "@/api/kanjiApi";
+import { saveKanji } from "../utils/KanjiHandler";
+import { ModalMessage } from "../ModalMessage";
 
 type KanjiData = {
   kanji: string;
@@ -28,7 +30,7 @@ export default function MultipleChoiceQuiz({currentUser} : {currentUser:any}) {
   const [correctAnswer, setCorrectAnswer] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [modal, setModal] = useState<{ message: string; type: "success" | "error" } | null>(null);
   // Fetch 4 random Kanji
   useEffect(() => {
     async function loadQuiz() {
@@ -85,7 +87,20 @@ export default function MultipleChoiceQuiz({currentUser} : {currentUser:any}) {
     setQuestion(questionText);
     setCorrectAnswer(correct);
   };
-
+  const handleSave = async (currentUser:any, kanji: string) => {
+      const mainKanji = await fetchKanji(kanji);
+      if (!currentUser || !mainKanji) return alert("You must log in to save progress.");
+      const payload = {
+        user_id: currentUser.id,
+        kanji: {
+          kanji: mainKanji.kanji,
+          meaning: mainKanji.main_meanings?.[0] ?? "",
+          reading: mainKanji.main_readings?.kun?.[0] ?? mainKanji.main_readings?.on?.[0] ?? "",
+          parts: mainKanji.radical?.parts ?? [],
+        },
+      };
+      saveKanji(payload, setModal)
+  }
   const handleAnswer = (option: string) => {
     setSelected(option);
   };
@@ -97,7 +112,17 @@ export default function MultipleChoiceQuiz({currentUser} : {currentUser:any}) {
   if (!quizItems.length) return <p className="p-4">No quiz data available.</p>;
 
 return (
+  <div>
+      {modal && (
+                  <ModalMessage
+                    message={modal.message}
+                    type={modal.type}
+                    onClose={() => setModal(null)}
+                  />
+                )}
+            
   <div className="quiz-container">
+     
     <div className="quiz-card">
       <h2 className="text-2xl font-bold mb-4">Multiple Choice Quiz</h2>
       <p className="quiz-question">{question}</p>
@@ -121,11 +146,14 @@ return (
       </div>
 
       {selected && (
+        <div>
         <p className="quiz-result">
           {selected === correctAnswer
             ? "✅ Correct!"
             : `❌ Wrong! The correct answer was ${correctAnswer}`}
         </p>
+        <button onClick={()=>handleSave(currentUser, correctAnswer)}>Save</button>
+        </div>
       )}
 
       <button
@@ -135,5 +163,6 @@ return (
         Next Question
       </button>
     </div>
+  </div>
   </div>
 )}

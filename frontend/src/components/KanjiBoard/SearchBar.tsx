@@ -1,5 +1,5 @@
 // src/components/SearchBar.tsx
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { fetchKanji } from "@/api/kanjiApi";
 import "./SearchBar.css"; // add styles for modal here
 

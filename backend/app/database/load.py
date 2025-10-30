@@ -9,7 +9,7 @@ sleep_time = total_time / steps
 # Set up a fancy progress bar
 with Progress(
     TextColumn("🚀 [bold cyan]Progress[/bold cyan]"),
-    BarColumn(bar_width=60, complete_style="bold green", finished_style="bold magenta"),
+    BarColumn(bar_width=100, complete_style="bold green", finished_style="bold magenta"),
     TextColumn("[progress.percentage]{task.percentage:>3.1f}%"),
     TimeElapsedColumn(),
     TimeRemainingColumn(),
