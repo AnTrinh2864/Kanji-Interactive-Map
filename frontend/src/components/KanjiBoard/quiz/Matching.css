@@ -1,0 +1,98 @@
+
+/* === Matching Grid === */
+.matching-grid {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  width: 45%;
+}
+
+.match-item {
+  height: 30%;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.8rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.match-item.left {
+  background: linear-gradient(135deg, #6ea8ff 10%, #884bf1 90%);
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: bold;
+  box-shadow: 0 0 8px rgba(84, 59, 246, 0.4);
+}
+
+.match-item.right {
+  background: linear-gradient(135deg, #a986f4 10%, #6593ff 90%);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  box-shadow: 0 0 8px rgba(75, 15, 114, 0.826);
+}
+
+/* === States === */
+.match-item.left.selected {
+  opacity: 0.6;
+  background: linear-gradient(135deg, #0bf522e6 10%, #0bf5f5 90%);
+  box-shadow: 0 0 15px rgba(36, 251, 222, 0.6);
+}
+.match-item.left.correct {
+  opacity: 0.6;
+  background: linear-gradient(135deg, #0bf522e6 10%, #0bf5f5 90%);
+  box-shadow: 0 0 15px rgba(36, 251, 222, 0.6);
+}
+.match-item.right.connected {
+  opacity: 0.6;
+  background: linear-gradient(135deg, #0bf522e6 10%, #0bf5f5 90%);
+  box-shadow: 0 0 15px rgba(36, 251, 222, 0.6);
+}
+
+/* === Buttons === */
+.controls {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.check-btn{
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.check-btn:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.6);
+}
+
+/* === Responsive === */
+@media (max-width: 600px) {
+  .matching-grid {
+    flex-direction: column;
+  }
+  .column {
+    width: 100%;
+  }
+  .match-item.left,
+  .match-item.right {
+    font-size: 1.2rem;
+  }
+}

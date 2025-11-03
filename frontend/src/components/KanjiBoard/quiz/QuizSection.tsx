@@ -1,6 +1,6 @@
 import {PartLinkBoard} from "./PartLinkBoard";
 import MultipleChoice from "./MultipleChoice";
-import FillInBlank from "./FillInBlank";
+import Matching from "./Matching";
 
 export default function QuizSection({ currentUser, defaultQuiz }: { currentUser: any, defaultQuiz:string }) {
 
@@ -11,7 +11,7 @@ export default function QuizSection({ currentUser, defaultQuiz }: { currentUser:
       case "Multiple Choice":
         return <MultipleChoice currentUser={currentUser} />;
       case "Fill in the blank":
-        return <FillInBlank currentUser={currentUser} />;
+        return <Matching currentUser={currentUser} />;
       default:
         return null;
     }

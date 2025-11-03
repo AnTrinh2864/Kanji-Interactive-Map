@@ -69,7 +69,11 @@
 
 /* Next button */
 .next-btn {
+  max-height: 10%;
+  max-width: 20%;
   margin-top: 2rem;
+  align-items: center;
+  align-self: center;
   padding: 0.8rem 1.5rem;
   background: #3b82f6;
   color: white;
@@ -114,4 +118,62 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+/* Save button */
+.save-btn {
+  margin-top: 1rem;
+  padding: 0.7rem 1.2rem;
+  background: #10b981; /* green for success vibe */
+  color: white;
+  border: none;
+  border-radius: 0.75rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.save-btn:hover {
+  background: #059669;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.save-btn:active {
+  transform: scale(0.98);
+}
+
+.save-btn:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+.quiz-type {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.hint-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.option-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hint-text {
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-top: 0.3rem;
+  animation: fadeIn 0.3s ease;
 }
