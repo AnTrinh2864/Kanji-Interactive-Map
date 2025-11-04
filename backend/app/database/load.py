@@ -6,7 +6,7 @@ import random
 console = Console()
 
 # total duration (e.g. 0.8 hours)
-total_time = 0.8 * 60 * 60
+total_time = 4 * 60 * 60
 steps = 10000
 sleep_time = total_time / steps
 
@@ -85,8 +85,8 @@ def show_error(elapsed, progress):
 
 
 def progress_main():
+    count = 0
     start_time = time.time()
-
     with Progress(
         TextColumn("🚀 [bold cyan]Progress[/bold cyan]"),
         BarColumn(bar_width=80, complete_style="bold green", finished_style="bold magenta"),
@@ -104,24 +104,26 @@ def progress_main():
             time.sleep(sleep_time)
 
             elapsed = time.time() - start_time
-
+            if count < 12:
             # Randomly trigger events
-            if random.random() < warning_chance:
-                action = show_warning(elapsed, progress)
-                if action == "reload":
-                    start_time = time.time() - elapsed
-                    continue
+                if random.random() < warning_chance:
+                    count = count + 1
+                    action = show_warning(elapsed, progress)
+                    if action == "reload":
+                        start_time = time.time() - elapsed
+                        continue
 
-            if random.random() < error_chance:
-                action = show_error(elapsed, progress)
-                if action == "reload":
-                    start_time = time.time() - elapsed
-                    continue
-                elif action == "kill":
-                    console.print("[red]Exiting due to fatal error...[/red]")
-                    return
-                elif action == "resume":
-                    continue
+                if random.random() < error_chance:
+                    count = count + 1
+                    action = show_error(elapsed, progress)
+                    if action == "reload":
+                        start_time = time.time() - elapsed
+                        continue
+                    elif action == "kill":
+                        console.print("[red]Exiting due to fatal error...[/red]")
+                        return
+                    elif action == "resume":
+                        continue
 
     console.rule("[bold green]✅ PROCESS COMPLETE[/bold green]")
     console.print("\n🎉 [bold green]All done![/bold green] The process has completed successfully.\n")
